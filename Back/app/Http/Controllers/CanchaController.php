@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cancha;
 use Illuminate\Http\Request;
 
 class CanchaController extends Controller
@@ -11,7 +12,7 @@ class CanchaController extends Controller
      */
     public function index()
     {
-        return response()->json(Cancha::all());  //Lista de las cnachas que hay
+            return response()->json(Cancha::all());  //Lista de las cnachas que hay
     }
 
     /**
