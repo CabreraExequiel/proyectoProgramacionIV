@@ -10,6 +10,7 @@ class Cancha extends Model
     use HasFactory;
 
     protected $fillable = [
+
         'nombre',
         'tipo',
         'precio_hora',
@@ -20,4 +21,5 @@ class Cancha extends Model
     {
         return $this->hasMany(Reserva::class);
     }
+
 }
