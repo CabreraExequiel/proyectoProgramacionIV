@@ -10,6 +10,16 @@ class Cancha extends Model
     use HasFactory;
 
     protected $fillable = [
-        'nombre'
+
+        'nombre',
+        'tipo',
+        'precio_hora',
     ];
+
+    // Relación: una cancha tiene muchas reservas
+    public function reservas()
+    {
+        return $this->hasMany(Reserva::class);
+    }
+
 }

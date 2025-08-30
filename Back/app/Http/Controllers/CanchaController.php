@@ -7,51 +7,52 @@ use Illuminate\Http\Request;
 
 class CanchaController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+
     public function index()
     {
-            return response()->json(Cancha::all());  //Lista de las cnachas que hay
+        $canchas = Cancha::all();
+        return view('canchas.index', compact('canchas'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request) //Crear una nueva cancha en caso de ser posible
+    public function create()
     {
-        $request -> validate([
-            'nombre' => 'required|string|max:100'
+        return view('canchas.create');
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+            'tipo' => 'nullable|string|max:255',
+            'precio_hora' => 'nullable|numeric',
         ]);
 
-        $cancha = Cancha::create([
-            'nombre'=>$request->nombre
+        Cancha::create($request->all());
+        return redirect()->route('canchas.index')->with('success', 'Cancha creada correctamente.');
+    }
+
+    public function edit(Cancha $cancha)
+    {
+        return view('canchas.edit', compact('cancha'));
+    }
+
+    public function update(Request $request, Cancha $cancha)
+    {
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+            'tipo' => 'nullable|string|max:255',
+            'precio_hora' => 'nullable|numeric',
         ]);
 
-        return response()->json($cancha);
+        $cancha->update($request->all());
+        return redirect()->route('canchas.index')->with('success', 'Cancha actualizada correctamente.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function destroy(Cancha $cancha)
     {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $cancha->delete();
+        return redirect()->route('canchas.index')->with('success', 'Cancha eliminada.');
     }
 }
+
+
