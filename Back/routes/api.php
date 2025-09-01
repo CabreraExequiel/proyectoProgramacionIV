@@ -5,7 +5,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\CanchaController;
 use App\Http\Controllers\ClienteController;
-use App\Http\Controllers\AuthController;  //Ultimo agregado
+use App\Http\Controllers\AuthController;
+ //Ultimo agregado
+
 
 Route::apiResource('categorias', CategoriaController::class);
 Route::get('/clientes', [ClienteController::class, 'index']);
@@ -13,4 +15,6 @@ Route::post('/clientes', [ClienteController::class, 'store']);
 Route::put('/clientes/{id}', [ClienteController::class, 'update']);
 Route::delete('/clientes/{id}', [ClienteController::class, 'destroy']);
 Route::apiResource('canchas', CanchaController::class);
+Route::post('/auth/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']); //Ultimo agregado
+
