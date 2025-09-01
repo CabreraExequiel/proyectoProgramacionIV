@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 
 class CanchaController extends Controller
 {
+
     public function index()
     {
         $canchas = Cancha::all();
@@ -53,4 +54,5 @@ class CanchaController extends Controller
         return redirect()->route('canchas.index')->with('success', 'Cancha eliminada.');
     }
 }
+
 
