@@ -1,7 +1,9 @@
 import { Routes } from '@angular/router';
 import { CategoriasComponent } from './componentes/categorias/categorias.component';
+import { LandingComponent } from './landing/landing.component'; 
 
 export const routes: Routes = [
-  { path: 'categorias', component: CategoriasComponent }, // /categorias
-  { path: '', redirectTo: 'categorias', pathMatch: 'full' } // redirige a /categorias
+  { path: '', component: LandingComponent },          
+  { path: 'categorias', component: CategoriasComponent }, 
+  { path: '**', redirectTo: '', pathMatch: 'full' } 
 ];
