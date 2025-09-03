@@ -1,0 +1,28 @@
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;       
+}
+
+
+/* 📱 Pantallas chicas (mobile first) */
+@media (max-width: 600px) {
+  .login-card {
+    width: 100%;   /* ocupa todo el ancho */
+  }
+}
+
+/* 📱 Tablets */
+@media (min-width: 601px) and (max-width: 991px) {
+  .login-card {
+    width: 80%;   /* un poco más angosto */
+  }
+}
+
+/* 💻 Desktop */
+@media (min-width: 992px) {
+  .login-card {
+    width: 400px;  /* tamaño fijo en pantallas grandes */
+  }
+}
