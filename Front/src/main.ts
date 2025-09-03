@@ -7,7 +7,7 @@ import { routes } from './app/app.routes';
 import { ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
-import { routes } from './app/app.routes'; // 👈 importamos las rutas reales
+
 
 bootstrapApplication(AppComponent, {
   providers: [
