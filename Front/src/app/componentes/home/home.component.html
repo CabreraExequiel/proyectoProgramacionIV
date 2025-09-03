@@ -1,1 +1,28 @@
-<p>home works!</p>
+<div class="home-container">
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-brand">MiApp</div>
+    <div class="navbar-links">
+      <button class="btn login">Login</button>
+      <button class="btn register">Registro</button>
+    </div>
+  </nav>
+
+  <!-- Sidebar + Content -->
+  <div class="main">
+    <aside class="sidebar">
+      <ul>
+        <li><a routerLink="inicio">Inicio</a></li>
+        <li><a routerLink="dashboard">Dashboard</a></li>
+        <li><a routerLink="canchas">Canchas</a></li>
+        <li><a routerLink="reservas">Reservas</a></li>
+      </ul>
+    </aside>
+
+    <div class="content">
+      <!-- Aquí se renderizan los componentes hijos -->
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>
+

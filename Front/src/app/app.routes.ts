@@ -1,12 +1,20 @@
 import { Routes } from '@angular/router';
-import { CategoriasComponent } from './componentes/categorias/categorias.component';
+
+import { LandingComponent } from './landing/landing.component'; 
+import { HomeComponent } from './componentes/home/home.component';
+import { InicioComponent } from './componentes/inicio/inicio.component';
 import { LoginComponent } from './componentes/login/login.component';
-import { LandingComponent } from './landing/landing.component';
 
 export const routes: Routes = [
+  { path: '', component: LandingComponent },   // página inicial
+  { 
+    path: 'home', 
+    component: HomeComponent, 
+    children:[
+      { path: '', redirectTo: 'inicio', pathMatch: 'full' }, // redirige al inicio
+      { path: 'inicio', component: InicioComponent }
+    ] 
+  }, 
   { path: 'login', component: LoginComponent },
-  { path: '', component: LandingComponent },
-  { path: 'categorias', component: CategoriasComponent },
-  { path: '**', redirectTo: '', pathMatch: 'full' } //Unifiqué rutas de Login y Landing, eliminando marcadores de conflicto
-
+  { path: '**', redirectTo: '', pathMatch: 'full' } 
 ];
