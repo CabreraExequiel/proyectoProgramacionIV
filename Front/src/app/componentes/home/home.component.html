@@ -1,12 +1,20 @@
 <div class="home-container">
   <!-- Navbar -->
   <nav class="navbar">
-    <div class="navbar-brand">MiApp</div>
-    <div class="navbar-links">
+  <div class="navbar-brand">MiApp</div>
+  <div class="navbar-links">
+    <ng-container *ngIf="!isLoggedIn">
       <button class="btn login" [routerLink]="['/login']">Login</button>
-      <button class="btn register">Registro</button>
-    </div>
-  </nav>
+      <button class="btn register" [routerLink]="['/register']">Registro</button>
+    </ng-container>
+
+    <ng-container *ngIf="isLoggedIn">
+      <button class="btn profile" [routerLink]="['/profile']">Perfil</button>
+      <button class="btn logout" (click)="logout()">Logout</button>
+    </ng-container>
+  </div>
+</nav>
+
 
   <!-- Sidebar + Content -->
   <div class="main">

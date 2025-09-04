@@ -5,9 +5,7 @@ body {
 
 .hero {
   position: relative;
-  background: url('/imagenes/cancha.jpg') no-repeat center center;
-  /* background: url('../../../assets/logo.png') no-repeat center center; */
-
+  background: url('../../../assets/cancha.jpg') no-repeat center center;
   background-size: cover;
   color: white;
   text-align: center;

@@ -36,6 +36,13 @@
 .navbar .navbar-links .register {
   background-color: #1e7e34; /* Verde aún más oscuro */
 }
+.navbar .navbar-links .logout {
+  background-color: #218838; /* Verde más oscuro */
+}
+
+.navbar .navbar-links .profile {
+  background-color: #1e7e34; /* Verde aún más oscuro */
+}
 
 /* Main: sidebar + content */
 .main {
