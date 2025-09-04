@@ -4,6 +4,9 @@ import { LandingComponent } from './landing/landing.component';
 import { HomeComponent } from './componentes/home/home.component';
 import { InicioComponent } from './componentes/inicio/inicio.component';
 import { LoginComponent } from './componentes/login/login.component';
+import { DashboardComponent } from './componentes/dashboard/dashboard.component';
+import { ReservasComponent } from './componentes/reservas/reservas.component';
+
 
 export const routes: Routes = [
   { path: '', component: LandingComponent },
@@ -12,9 +15,15 @@ export const routes: Routes = [
     component: HomeComponent, 
     children: [
       { path: '', redirectTo: 'inicio', pathMatch: 'full' },
-      { path: 'inicio', component: InicioComponent }
+      { path: 'inicio', component: InicioComponent },
+      { path: 'dashboard', component: DashboardComponent },
+      { path: 'reservas', component: ReservasComponent }  
+
+
     ] 
   }, 
   { path: 'login', component: LoginComponent },
-  { path: '**', redirectTo: '', pathMatch: 'full' } 
-];
+  { path: '**', redirectTo: '', pathMatch: 'full' } ,
+
+
+]

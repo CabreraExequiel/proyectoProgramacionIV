@@ -13,7 +13,7 @@ bootstrapApplication(AppComponent, {
   providers: [
     importProvidersFrom(
       HttpClientModule,
-      RouterModule.forRoot(routes) // 👈 usamos estas rutas
+      RouterModule.forRoot(routes) 
     )
   ]
 });

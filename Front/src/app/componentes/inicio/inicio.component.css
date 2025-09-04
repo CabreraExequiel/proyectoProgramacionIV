@@ -6,17 +6,17 @@ body {
 .hero {
   position: relative;
   background: url('/imagenes/cancha.jpg') no-repeat center center;
+  /* background: url('../../../assets/logo.png') no-repeat center center; */
+
   background-size: cover;
   color: white;
   text-align: center;
   padding: 40px 20px;
-  /* min-height: 100vh; */ /* opcional quitar para que el contenido fluya */
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   z-index: 1;
-  /* overflow: hidden; */ /* quitar para permitir scroll */
 }
 
 .hero::before {
