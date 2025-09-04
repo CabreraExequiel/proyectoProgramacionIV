@@ -16,11 +16,18 @@ class Reserva extends Model
         'hora_inicio',
         'hora_fin',
         'cancha_id',
+        'estado',
     ];
 
     // Relación con Cancha
-    public function cancha()
-    {
-        return $this->belongsTo(Cancha::class);
-    }
+public function usuario()
+{
+    return $this->belongsTo(User::class, 'user_id');
+}
+
+public function cancha()
+{
+    return $this->belongsTo(Cancha::class);
+}
+
 }

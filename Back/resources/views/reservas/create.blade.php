@@ -21,7 +21,19 @@
     <input type="time" name="hora_fin" required><br>
 
     <label>Cancha:</label>
-    <input type="number" name="cancha_id" required><br>
+    <select name="cancha_id" required>
+        @foreach($canchas as $cancha)
+            <option value="{{ $cancha->id }}">{{ $cancha->nombre }} - {{ $cancha->tipo }}</option>
+        @endforeach
+    </select><br>
+
+    <label>Estado:</label>
+    <select name="estado">
+        <option value="activa">Activa</option>
+        <option value="pendiente">Pendiente</option>
+        <option value="cancelada">Cancelada</option>
+    </select><br>
+
 
     <button type="submit">Guardar</button>
 </form>

@@ -11,6 +11,7 @@
         <th>Fecha</th>
         <th>Hora</th>
         <th>Cancha</th>
+        <th>Estado</th>
         <th>Acciones</th>
     </tr>
     @foreach($reservas as $reserva)
@@ -20,6 +21,7 @@
         <td>{{ $reserva->fecha }}</td>
         <td>{{ $reserva->hora_inicio }} - {{ $reserva->hora_fin }}</td>
         <td>{{ $reserva->cancha->nombre ?? 'N/A' }}</td>
+        <td>{{ $reserva->estado }}</td>
         <td>
             <a href="{{ route('reservas.edit', $reserva) }}">Editar</a>
             <form action="{{ route('reservas.destroy', $reserva) }}" method="POST" style="display:inline">

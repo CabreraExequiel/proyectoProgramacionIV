@@ -23,7 +23,21 @@
     <input type="time" name="hora_fin" value="{{ old('hora_fin', $reserva->hora_fin) }}" required><br>
 
     <label>Cancha:</label>
-    <input type="number" name="cancha_id" value="{{ old('cancha_id', $reserva->cancha_id) }}" required><br>
+    <select name="cancha_id" required>
+        @foreach($canchas as $cancha)
+            <option value="{{ $cancha->id }}" {{ $cancha->id == old('cancha_id', $reserva->cancha_id) ? 'selected' : '' }}>
+                {{ $cancha->nombre }} - {{ $cancha->tipo }}
+            </option>
+        @endforeach
+    </select><br>
+    <label>Estado:</label>
+    <select name="estado">
+        <option value="activa" {{ old('estado', $reserva->estado) == 'activa' ? 'selected' : '' }}>Activa</option>
+        <option value="pendiente" {{ old('estado', $reserva->estado) == 'pendiente' ? 'selected' : '' }}>Pendiente</option>
+        <option value="cancelada" {{ old('estado', $reserva->estado) == 'cancelada' ? 'selected' : '' }}>Cancelada</option>
+    </select><br>
+
+
 
     <button type="submit">Actualizar</button>
     <a href="{{ route('reservas.index') }}">Cancelar</a>
