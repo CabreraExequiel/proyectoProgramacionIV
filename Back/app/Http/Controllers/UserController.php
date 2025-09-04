@@ -24,7 +24,9 @@ class UserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => bcrypt($request->password),
+            'role' => $request->role ?? 'usuario', // rol por defecto: usuario
         ]);
+
         return redirect()->route('users.index');
     }
 
@@ -39,7 +41,9 @@ class UserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => bcrypt($request->password),
+            'role' => $request->role ?? $user->role, // mantener rol actual si no se envía
         ]);
+
         return redirect()->route('users.index');
     }
 

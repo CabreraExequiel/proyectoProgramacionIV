@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';   // 👈 Importar Router
 
 @Component({
   selector: 'app-login',
@@ -14,33 +15,37 @@ export class LoginComponent {
   loginForm: FormGroup;
   errorMessage: string = '';
 
-  constructor(private fb: FormBuilder, private authService: AuthService) {
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private router: Router   // 👈 Inyectar Router
+  ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]]
     });
   }
 
- onSubmit(): void {
-  if (this.loginForm.invalid) return;
+  onSubmit(): void {
+    if (this.loginForm.invalid) return;
 
-  this.authService.login(this.loginForm.value).subscribe({
-    next: (res) => {
-      if (res.access_token) {
-        this.authService.saveToken(res.access_token);
-        alert('Login exitoso!');
+    this.authService.login(this.loginForm.value).subscribe({
+      next: (res) => {
+        if (res.access_token) {
+          this.authService.saveToken(res.access_token);
+          // ✅ Redirigir al home
+          this.router.navigate(['/home']);
+        }
+      },
+      error: (err) => {
+        if (err?.error?.message) {
+          this.errorMessage = err.error.message;
+        } else if (err?.status === 0) {
+          this.errorMessage = 'No se pudo conectar con el servidor';
+        } else {
+          this.errorMessage = 'Error en el login';
+        }
       }
-    },
-    error: (err) => {
-      // Manejo seguro
-      if (err?.error?.message) {
-        this.errorMessage = err.error.message;
-      } else if (err?.status === 0) {
-        this.errorMessage = 'No se pudo conectar con el servidor';
-      } else {
-        this.errorMessage = 'Error en el login';
-      }
-    }
-  });
- }
+    });
+  }
 }

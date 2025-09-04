@@ -1,21 +1,34 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, BehaviorSubject } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://127.0.0.1:8000/api'; // base API
+  private apiUrl = 'http://127.0.0.1:8000/api';
+  private loggedIn = new BehaviorSubject<boolean>(!!this.getToken());
+  loggedIn$ = this.loggedIn.asObservable();
+
+  private userRole = new BehaviorSubject<string>(localStorage.getItem('user_role') || '');
+currentUserRole$ = this.userRole.asObservable();
 
   constructor(private http: HttpClient) {}
 
   login(credentials: { email: string; password: string }): Observable<any> {
-    return this.http.post(`${this.apiUrl}/auth/login`, credentials);
-  }
+  return this.http.post(`${this.apiUrl}/auth/login`, credentials).pipe(
+    tap((res: any) => {
+      this.saveToken(res.token);
+      localStorage.setItem('user_role', res.user.role); // <--- guardar rol
+      this.userRole.next(res.user.role);
+    })
+  );
+}
 
   saveToken(token: string): void {
     localStorage.setItem('access_token', token);
+    this.loggedIn.next(true);
   }
 
   getToken(): string | null {
@@ -23,6 +36,13 @@ export class AuthService {
   }
 
   logout(): void {
-    localStorage.removeItem('access_token');
+  localStorage.removeItem('access_token');
+  localStorage.removeItem('user_role'); // <--- limpiar rol
+  this.loggedIn.next(false);
+  this.userRole.next('');
+}
+
+  isLoggedIn(): boolean {
+    return !!this.getToken();
   }
 }
