@@ -12,8 +12,14 @@
   <div class="main">
     <aside class="sidebar">
       <ul>
+<<<<<<< Ramos-Leonardo
         <li><a routerLink="inicio">Inicio</a></li>
         <li><a routerLink="dashboard">Dashboard</a></li>
+=======
+        <li *ngIf="isUser"><a routerLink="inicio">Inicio</a></li>
+        <li *ngIf="isAdmin"><a routerLink="dashboard">Dashboard</a></li>
+
+>>>>>>> main
         <li><a routerLink="canchas">Canchas</a></li>
         <li><a routerLink="reservas">Reservas</a></li>
       </ul>
@@ -25,4 +31,3 @@
     </div>
   </div>
 </div>
-
