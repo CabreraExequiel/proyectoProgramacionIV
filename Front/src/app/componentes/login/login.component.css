@@ -1,28 +1,121 @@
+/* Contenedor principal para centrar el formulario */
 .login-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;       
+  min-height: 100vh;
+  background-color: #0d1b2a; /* Fondo azul oscuro del sidebar */
+  padding: 1rem;
 }
 
+/* Tarjeta del formulario */
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  padding: 2.5rem;
+  background-color: #ffffff;
+  border-radius: 8px; /* Borde redondeado */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  font-family: sans-serif;
+}
 
-/* 📱 Pantallas chicas (mobile first) */
+/* Estilos de los títulos */
+.login-card h2 {
+  font-size: 2rem;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #333333;
+}
+
+/* Grupos de formulario */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+/* Etiquetas */
+.form-group label {
+  display: block;
+  font-weight: 500;
+  color: #555555;
+  margin-bottom: 0.5rem;
+}
+
+/* Campos de entrada */
+.form-group input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #cccccc;
+  border-radius: 6px;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #007bff; /* Azul de enfoque */
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+/* Mensajes de error */
+.error {
+  font-size: 0.875rem;
+  color: #dc3545; /* Rojo */
+  margin-top: 0.25rem;
+}
+
+.error-backend {
+  font-size: 0.875rem;
+  color: #dc3545;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+/* Botón de envío */
+button[type="submit"] {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #218838; /* Verde del CSS de referencia */
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button[type="submit"]:hover {
+  background-color: #1e7e34; /* Verde más oscuro al pasar el ratón */
+}
+
+button[type="submit"]:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+/* Pie de página del formulario */
+.footer {
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+.footer small {
+  color: #6c757d;
+}
+
+.footer a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.footer a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive */
 @media (max-width: 600px) {
   .login-card {
-    width: 100%;   /* ocupa todo el ancho */
-  }
-}
-
-/* 📱 Tablets */
-@media (min-width: 601px) and (max-width: 991px) {
-  .login-card {
-    width: 80%;   /* un poco más angosto */
-  }
-}
-
-/* 💻 Desktop */
-@media (min-width: 992px) {
-  .login-card {
-    width: 400px;  /* tamaño fijo en pantallas grandes */
+    padding: 1.5rem;
+    max-width: 95%;
   }
 }

@@ -14,6 +14,7 @@ class Cancha extends Model
         'nombre',
         'tipo',
         'precio_hora',
+        'cant_jugadores',
     ];
 
     // Relación: una cancha tiene muchas reservas

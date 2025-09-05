@@ -7,9 +7,11 @@ use App\Http\Controllers\CanchaController;
 use App\Http\Controllers\AuthController;  //Ultimo agregado
 use App\Http\Controllers\ReservaController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\CanchaController2;
 
 
 Route::apiResource('canchas', CanchaController::class);
 Route::apiResource('reservas', ReservaController::class);
 Route::post('/auth/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']); //Ultimo agregado
+Route::apiResource('canchas2',CanchaController2::class);
