@@ -12,13 +12,9 @@ bootstrapApplication(AppComponent, {
   providers: [
     importProvidersFrom(
       HttpClientModule,
-<<<<<<< HEAD
-      RouterModule.forRoot(routes) 
-=======
       ReactiveFormsModule,
       FormsModule,   // 👈
       RouterModule.forRoot(routes)
->>>>>>> main
     )
   ]
 });
