@@ -1,32 +1,91 @@
-<!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"> -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-<div class="dashboard-container">
-  <h2>📊 Panel de Administración</h2>
+<div class="dashboard-container container mt-4">
+  <h2 class="mb-4">📊 Panel de Administración</h2>
 
   <div *ngIf="loading">⏳ Cargando métricas...</div>
   <div *ngIf="error">❌ Error al cargar métricas</div>
 
   <div *ngIf="!loading && !error">
-    <div class="metric-grid">
+    <div class="row g-3 mb-4">
+      <div class="col-md-3">
+        <div class="card text-white bg-primary h-100" (click)="mostrarDetalle('usuariosRegistrados')" style="cursor: pointer;">
+          <div class="card-body">
+            <h5 class="card-title">Usuarios registrados</h5>
+            <p class="card-text fs-4">{{ usuariosRegistradosList.length }}</p>
+          </div>
+        </div>
+      </div>
 
-      <div class="metric-card" (click)="mostrarDetalle('ocupacion')">
-      <h3>Ocupación actual</h3>
-      <p>{{ ocupacion !== null ? ocupacion + '%' : '--%' }}</p>
-    </div>
+      <div class="col-md-3">
+        <div class="card text-white bg-success h-100" (click)="mostrarDetalle('ocupacion')" style="cursor: pointer;">
+          <div class="card-body">
+            <h5 class="card-title">Ocupación actual</h5>
+            <p class="card-text fs-4">{{ ocupacion !== null ? ocupacion + '%' : '--%' }}</p>
+          </div>
+        </div>
+      </div>
 
-    <div class="metric-card" (click)="mostrarDetalle('reservasActivas')">
-      <h3>Reservas activas</h3>
-      <p>{{ reservasActivas }}</p>
+      <div class="col-md-3">
+        <div class="card text-white bg-info h-100" (click)="mostrarDetalle('reservasActivas')" style="cursor: pointer;">
+          <div class="card-body">
+            <h5 class="card-title">Reservas activas</h5>
+            <p class="card-text fs-4">{{ reservasActivas }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card text-dark bg-warning h-100" (click)="mostrarDetalle('reservasPendientes')" style="cursor: pointer;">
+          <div class="card-body">
+            <h5 class="card-title">Reservas pendientes</h5>
+            <p class="card-text fs-4">{{ reservasPendientesList.length }}</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-3">
+  <div class="card text-white bg-dark h-100" (click)="mostrarDetalle('ingresosMensuales')" style="cursor: pointer;">
+    <div class="card-body">
+      <h5 class="card-title">Ingresos mensuales</h5>
+      <p class="card-text fs-4">${{ ingresosMensuales }}</p>
     </div>
   </div>
+</div>
 
-    <div class="progress-bar-container">
-      <div class="progress-bar-fill" [style.width.%]="ocupacion"></div>
+
     </div>
 
-    <div *ngIf="selectedCard === 'reservasActivas'">
+    <div class="mb-4">
+      <label class="form-label">Nivel de ocupación</label>
+      <div class="progress">
+        <div class="progress-bar bg-success" [style.width.%]="ocupacion">{{ ocupacion }}%</div>
+      </div>
+    </div>
+
+    <div *ngIf="selectedCard === 'usuariosRegistrados'" class="fade-in">
+      <h3>👥 Usuarios Registrados</h3>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Fecha de registro</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let usuario of usuariosRegistradosList">
+            <td>{{ usuario.name }}</td>
+            <td>{{ usuario.email }}</td>
+            <td>{{ usuario.created_at | date:'short' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div *ngIf="selectedCard === 'reservasActivas'" class="fade-in">
       <h3>📅 Reservas Activas</h3>
-      <table class="table">
+      <table class="table table-striped">
         <thead>
           <tr>
             <th>Cliente</th>
@@ -40,12 +99,43 @@
             <td>{{ reserva.cliente }}</td>
             <td>{{ reserva.cancha }}</td>
             <td>{{ reserva.hora_inicio }} - {{ reserva.hora_fin }}</td>
-            <td>
-              <span class="badge bg-success">{{ reserva.estado }}</span>
-            </td>
+            <td><span class="badge bg-success">{{ reserva.estado }}</span></td>
           </tr>
         </tbody>
       </table>
     </div>
+
+    <div *ngIf="selectedCard === 'reservasPendientes'" class="fade-in">
+      <h3>📌 Reservas Pendientes</h3>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Cliente</th>
+            <th>Cancha</th>
+            <th>Horario</th>
+            <th>Estado</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let reserva of reservasPendientesList">
+            <td>{{ reserva.cliente }}</td>
+            <td>{{ reserva.cancha }}</td>
+            <td>{{ reserva.hora_inicio }} - {{ reserva.hora_fin }}</td>
+            <td><span class="badge bg-warning text-dark">{{ reserva.estado }}</span></td>
+            <td>
+              <button class="btn-aprobar" (click)="aprobarReserva(reserva.id)">Aprobar</button>
+              <button class="btn-rechazar" (click)="rechazarReserva(reserva.id)">Rechazar</button>
+            </td>
+
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+      <div *ngIf="selectedCard === 'ingresosMensuales'">
+        <h3>💰 Detalle de Ingresos</h3>
+        <p>Total generado este mes: <strong>${{ ingresosMensuales }}</strong></p>
+      </div>
   </div>
 </div>

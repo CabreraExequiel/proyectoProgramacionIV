@@ -34,7 +34,7 @@ export class ReservasComponent implements OnInit {
       fecha: ['', Validators.required],
       hora_inicio: ['', Validators.required],
       hora_fin: ['', Validators.required],
-      estado: ['Activa', Validators.required] 
+      estado: ['activa', Validators.required] 
     });
 
     this.cargarCanchas();
@@ -69,7 +69,6 @@ export class ReservasComponent implements OnInit {
       },
       error: (err) => {
         if (err.status === 422) {
-          // Errores de validación del backend
           this.erroresBackend = err.error.errors;
         } else {
           console.error('Error al crear reserva', err);

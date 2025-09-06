@@ -12,15 +12,31 @@ export class DashboardService {
 
   getMetrics(): Observable<{ ocupacion: number; reservas_activas: number }> {
     return this.http.get<{ ocupacion: number; reservas_activas: number }>(
-      `${this.apiUrl}/dashboard-metrics`
+      `${this.apiUrl}/reservas/metrics`
     );
   }
 
   getReservasActivas(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/reservas-activas`);
+    return this.http.get<any[]>(`${this.apiUrl}/reservas/activas`);
   }
+
 
   getAll(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/canchas`);
   }
+
+  getUsuariosRegistrados(): Observable<any[]> {
+  return this.http.get<any[]>(`${this.apiUrl}/usuarios-registrados`);
+}
+ getReservasPendientes(): Observable<any[]> {
+  return this.http.get<any[]>(`${this.apiUrl}/reservas-pendientes`);
+}
+
+actualizarEstadoReserva(id: number, nuevoEstado: string): Observable<any> {
+  return this.http.put(`${this.apiUrl}/reservas/${id}/estado`, { estado: nuevoEstado });
+}
+getIngresosMensuales(): Observable<{ ingresos: number }> {
+  return this.http.get<{ ingresos: number }>(`${this.apiUrl}/reservas/ingresos`);
+}
+
 }

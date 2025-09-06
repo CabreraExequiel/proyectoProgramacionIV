@@ -7,4 +7,8 @@ import { RouterModule, RouterOutlet } from '@angular/router';
   imports: [RouterOutlet, RouterModule],
   template: `<router-outlet></router-outlet>`
 })
-export class AppComponent {}
+export class AppComponent {
+  title(title: any) {
+    throw new Error('Method not implemented.');
+  }
+}
