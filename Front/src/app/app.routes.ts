@@ -1,21 +1,26 @@
 // app.routes.ts
-import {  Routes } from '@angular/router'; 
-import { LandingComponent } from './landing/landing.component'; 
+import {  Routes } from '@angular/router';
+import { LandingComponent } from './landing/landing.component';
 import { HomeComponent } from './componentes/home/home.component';
 import { InicioComponent } from './componentes/inicio/inicio.component';
 import { LoginComponent } from './componentes/login/login.component';
+<<<<<<< HEAD
 import { DashboardComponent } from './componentes/dashboard/dashboard.component';
 import { ReservasComponent } from './componentes/reservas/reservas.component';
 
+=======
+import { CanchasComponent } from './componentes/canchas/canchas.component';
+>>>>>>> main
 
 export const routes: Routes = [
   { path: '', component: LandingComponent },
-  { 
-    path: 'home', 
-    component: HomeComponent, 
+  {
+    path: 'home',
+    component: HomeComponent,
     children: [
       { path: '', redirectTo: 'inicio', pathMatch: 'full' },
       { path: 'inicio', component: InicioComponent },
+<<<<<<< HEAD
       { path: 'dashboard', component: DashboardComponent },
       { path: 'reservas', component: ReservasComponent }  
 
@@ -27,3 +32,11 @@ export const routes: Routes = [
 
 
 ]
+=======
+      { path: 'canchas', component: CanchasComponent }
+    ]
+  },
+  { path: 'login', component: LoginComponent },
+  { path: '**', redirectTo: '', pathMatch: 'full' }
+];
+>>>>>>> main
