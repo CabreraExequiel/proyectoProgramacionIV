@@ -2,14 +2,14 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\CategoriaController;
-use App\Http\Controllers\CanchaController;
 use App\Http\Controllers\AuthController;  //Ultimo agregado
 use App\Http\Controllers\ReservaController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\CanchaController2;
 
 Route::apiResource('canchas', CanchaController::class);
+Route::apiResource('canchas2',CanchaController2::class);
+
 Route::post('/auth/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']); //Ultimo agregado
 
@@ -24,7 +24,6 @@ Route::get('/reservas/activas', [ReservaController::class, 'getReservasActivas']
 Route::middleware('auth:api')->group(function () {
     Route::post('/reservas', [ReservaController::class, 'store']);
 });
-
 
 
 Route::get('/usuarios-registrados', [UserController::class, 'getUsuariosRegistrados']);
