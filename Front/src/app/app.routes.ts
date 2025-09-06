@@ -4,7 +4,13 @@ import { LandingComponent } from './landing/landing.component';
 import { HomeComponent } from './componentes/home/home.component';
 import { InicioComponent } from './componentes/inicio/inicio.component';
 import { LoginComponent } from './componentes/login/login.component';
+<<<<<<< HEAD
+import { DashboardComponent } from './componentes/dashboard/dashboard.component';
+import { ReservasComponent } from './componentes/reservas/reservas.component';
+
+=======
 import { CanchasComponent } from './componentes/canchas/canchas.component';
+>>>>>>> main
 
 export const routes: Routes = [
   { path: '', component: LandingComponent },
@@ -14,9 +20,23 @@ export const routes: Routes = [
     children: [
       { path: '', redirectTo: 'inicio', pathMatch: 'full' },
       { path: 'inicio', component: InicioComponent },
+<<<<<<< HEAD
+      { path: 'dashboard', component: DashboardComponent },
+      { path: 'reservas', component: ReservasComponent }  
+
+
+    ] 
+  }, 
+  { path: 'login', component: LoginComponent },
+  { path: '**', redirectTo: '', pathMatch: 'full' } ,
+
+
+]
+=======
       { path: 'canchas', component: CanchasComponent }
     ]
   },
   { path: 'login', component: LoginComponent },
   { path: '**', redirectTo: '', pathMatch: 'full' }
 ];
+>>>>>>> main

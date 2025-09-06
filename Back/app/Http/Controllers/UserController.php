@@ -52,4 +52,11 @@ class UserController extends Controller
         $user->delete();
         return redirect()->route('users.index');
     }
+
+    public function getUsuariosRegistrados()
+    {
+        $usuarios = User::select('id', 'name', 'email', 'created_at')->get();
+
+        return response()->json($usuarios);
+    }
 }

@@ -1,0 +1,90 @@
+/* Contenedor principal */
+.reserva-container {
+  width: 350px;
+  height: auto;
+  margin:  auto;
+  padding: 5px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Título */
+.reserva-container h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #007bff;
+  font-weight: 600;
+  font-size: 20px;
+}
+
+/* Alertas */
+.alert-success, .alert-danger {
+  padding: 8px 12px;
+  font-size: 13px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+
+/* Lista de errores */
+.alert-danger ul {
+  padding-left: 18px;
+  margin: 0;
+}
+.alert-danger li {
+  margin-bottom: 3px;
+}
+
+/* Formulario */
+.form-group {
+  margin-bottom: 12px;
+}
+.form-group label {
+  font-weight: 500;
+  margin-bottom: 4px;
+  font-size: 13px;
+  display: block;
+}
+.form-control {
+  width: 100%;
+  border-radius: 6px;
+  border: 1px solid #ced4da;
+  padding: 6px 10px;
+  font-size: 13px;
+  box-sizing: border-box;
+}
+.form-control:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 1.5px rgba(0,123,255,0.2);
+  outline: none;
+}
+
+.btn-confirmar {
+  background-color: green;
+  color: white;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-confirmar:disabled {
+  background-color: green;
+  cursor: not-allowed;
+}
+
+/* Centrado del botón */
+.text-center {
+  text-align: center;
+}
+
+/* Responsive para móviles */
+@media (max-width: 480px) {
+  .reserva-container {
+    width: 100%;
+    padding: 15px;
+  }
+}
