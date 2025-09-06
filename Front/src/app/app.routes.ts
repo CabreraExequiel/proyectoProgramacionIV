@@ -9,7 +9,6 @@ import { ReservasComponent } from './componentes/reservas/reservas.component';
 import { CanchasComponent } from './componentes/canchas/canchas.component';
 
 
-
 export const routes: Routes = [
   { path: '', component: LandingComponent },
   {

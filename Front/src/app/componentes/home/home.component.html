@@ -22,8 +22,8 @@
   <div class="main">
     <aside class="sidebar">
       <ul>
-        <li><a routerLink="inicio">Inicio</a></li>
-        <li><a routerLink="dashboard">Dashboard</a></li>
+        <li><a *ngIf="isUser" routerLink="inicio">Inicio</a></li>
+        <li><a *ngIf="isAdmin" routerLink="dashboard">Dashboard</a></li>
         <li><a routerLink="canchas">Canchas</a></li>
         <li><a routerLink="reservas">Reservas</a></li>
       </ul>
