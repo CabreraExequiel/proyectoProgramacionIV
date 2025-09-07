@@ -18,8 +18,8 @@ export class HomeComponent {
   constructor(private authService: AuthService, private router: Router) {
     this.authService.loggedIn$.subscribe(status => this.isLoggedIn = status);
     this.authService.currentUserRole$.subscribe(role => {
-  this.isAdmin = role === 'admin';
-  this.isUser = role === 'user';
+  this.isAdmin = role === 'administrador';
+  this.isUser = role === 'usuario';
 });
   }
 
