@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class DashboardService {
-  private apiUrl = 'http://localhost:8000/api'; 
+  private apiUrl = 'http://127.0.0.1:8000/api'; 
 
   constructor(private http: HttpClient) {}
 
@@ -22,7 +22,7 @@ export class DashboardService {
 
 
   getAll(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/canchas`);
+    return this.http.get<any[]>(`${this.apiUrl}/canchas2`);
   }
 
   getUsuariosRegistrados(): Observable<any[]> {

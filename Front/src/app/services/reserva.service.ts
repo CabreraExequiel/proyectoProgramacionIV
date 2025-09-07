@@ -9,12 +9,12 @@ export class ReservaService {
   getReservasActivas() {
     throw new Error('Method not implemented.');
   }
-  private apiUrl = 'http://localhost:8000/api'; 
+  private apiUrl = 'http://127.0.0.1:8000/api'; 
 
   constructor(private http: HttpClient) {}
 
   getCanchas(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/canchas`);
+    return this.http.get(`${this.apiUrl}/canchas2`);
   }
 
   getHorarios(fecha: string): Observable<any> {
@@ -23,8 +23,10 @@ export class ReservaService {
 crearReserva(reserva: any): Observable<any> {
   const token = localStorage.getItem('access_token'); 
   if (!token) {
-    console.error('No hay token disponible');
-    return new Observable();
+    // Retornamos un observable que emite error
+    return new Observable(observer => {
+      observer.error({ message: 'Usuario no autenticado' });
+    });
   }
 
   const headers = new HttpHeaders({

@@ -19,10 +19,11 @@ currentUserRole$ = this.userRole.asObservable();
   login(credentials: { email: string; password: string }): Observable<any> {
   return this.http.post(`${this.apiUrl}/auth/login`, credentials).pipe(
     tap((res: any) => {
-      this.saveToken(res.token);
-      localStorage.setItem('user_role', res.user.role); // <--- guardar rol
-      this.userRole.next(res.user.role);
-    })
+  this.saveToken(res.access_token); // ✅ Coincide con tu backend
+  localStorage.setItem('user_role', res.user.role);
+  this.userRole.next(res.user.role);
+})
+
   );
 }
 
