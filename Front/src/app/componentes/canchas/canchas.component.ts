@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { Cancha, CanchasService } from '../../services/cancha.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-canchas',
@@ -16,6 +17,10 @@ export class CanchasComponent implements OnInit {
   canchas: Cancha[] = [];
   cargando: boolean = true;
   error: string = '';
+  isAdmin = false;
+  isUser = false;
+  isLoggedIn = false;
+  isMaster = false
 
   formCancha!: FormGroup;
   editando: boolean = false;
@@ -24,8 +29,16 @@ export class CanchasComponent implements OnInit {
 
   constructor(
     private canchasService: CanchasService, // 👈 minúscula para convención
-    private fb: FormBuilder
-  ) {}
+    private fb: FormBuilder,
+    private authService: AuthService
+  ) {
+    this.authService.loggedIn$.subscribe(status => this.isLoggedIn = status);
+    this.authService.currentUserRole$.subscribe(role => {
+  this.isAdmin = role === 'administrador';
+  this.isUser = role === 'usuario';
+  this.isMaster = role === 'master'
+  })
+}
 
   ngOnInit(): void {
     this.obtenerCanchas();

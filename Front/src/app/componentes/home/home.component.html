@@ -3,7 +3,7 @@
 <div class="home-container">
   <!-- Navbar -->
   <nav class="navbar">
-  <div class="navbar-brand">MiApp</div>
+  <div class="navbar-brand">SomosFutbol</div>
   <div class="navbar-links">
     <ng-container *ngIf="!isLoggedIn">
       <button class="btn login" [routerLink]="['/login']">Login</button>
@@ -11,7 +11,7 @@
     </ng-container>
 
     <ng-container *ngIf="isLoggedIn">
-      <button class="btn profile" [routerLink]="['/profile']">Perfil</button>
+      <button *ngIf="isUser" class="btn profile" [routerLink]="['/profile']">Perfil</button>
       <button class="btn logout" (click)="logout()">Logout</button>
     </ng-container>
   </div>
@@ -22,10 +22,14 @@
   <div class="main">
     <aside class="sidebar">
       <ul>
-        <li><a *ngIf="isUser" routerLink="inicio">Inicio</a></li>
-        <li><a *ngIf="isAdmin" routerLink="dashboard">Dashboard</a></li>
+        <li>
+          <a *ngIf="!isLoggedIn || isUser || isMaster" routerLink="inicio">Inicio</a>
+        </li>        
+        <li><a *ngIf="isAdmin || isMaster" routerLink="dashboard">Dashboard</a></li>
         <li><a routerLink="canchas">Canchas</a></li>
-        <li><a routerLink="reservas">Reservas</a></li>
+        <li><a *ngIf="isAdmin || isUser ||isMaster" routerLink="reservas">Reservas</a></li>
+        <li><a *ngIf="isAdmin" routerLink="usuarios">Usuarios</a></li>
+        <button *ngIf="isMaster" class="btn btn-primary mb-3" [routerLink]="['/register']">Registro</button>
       </ul>
     </aside>
 

@@ -65,6 +65,10 @@ class User extends Authenticatable implements JWTSubject{
     {
         return $this->role === 'usuario';
     }
+    public function isMaster(): bool
+    {
+        return $this->role === 'master';
+    }
 
 
     public function reservas()

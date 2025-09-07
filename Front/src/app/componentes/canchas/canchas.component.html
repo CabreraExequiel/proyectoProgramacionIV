@@ -6,7 +6,7 @@
   <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
 
   <!-- Botón para crear nueva cancha -->
-  <button class="btn btn-primary mb-3" (click)="mostrarFormularioCrear()">Crear Cancha</button>
+  <button *ngIf="isAdmin || isMaster" class="btn btn-primary mb-3" (click)="mostrarFormularioCrear()">Crear Cancha</button>
 
   <!-- Formulario Crear/Editar -->
   <div *ngIf="mostrarForm" class="card p-3 mb-4">
@@ -60,9 +60,22 @@
         <td data-label="Precio por hora">{{ cancha.precio_hora || '-' }}</td>
         <td data-label="Cantidad jugadores">{{ cancha.cant_jugadores || '-' }}</td>
         <td data-label="Acciones">
-          <button class="btn btn-warning btn-sm me-2" (click)="mostrarFormularioEditar(cancha)">Editar</button>
-          <button class="btn btn-danger btn-sm" (click)="eliminarCancha(cancha.id)">Eliminar</button>
-        </td>
+  <div class="d-flex gap-2">
+    <!-- Solo Admin o Master pueden editar/eliminar -->
+    <button *ngIf="isAdmin || isMaster" class="btn btn-warning btn-sm" (click)="mostrarFormularioEditar(cancha)">
+      Editar
+    </button>
+    <button *ngIf="isAdmin || isMaster" class="btn btn-danger btn-sm" (click)="eliminarCancha(cancha.id)">
+      Eliminar
+    </button>
+
+    <!-- Usuarios normales o master pueden ver -->
+    <button *ngIf="isUser || isMaster" class="btn btn-primary btn-sm">
+      Ver cancha
+    </button>
+  </div>
+</td>
+
       </tr>
     </tbody>
   </table>

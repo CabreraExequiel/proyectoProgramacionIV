@@ -14,12 +14,14 @@ export class HomeComponent {
   isLoggedIn = false;
   isAdmin = false;
   isUser = false;
+  isMaster =false
 
   constructor(private authService: AuthService, private router: Router) {
     this.authService.loggedIn$.subscribe(status => this.isLoggedIn = status);
     this.authService.currentUserRole$.subscribe(role => {
   this.isAdmin = role === 'administrador';
   this.isUser = role === 'usuario';
+  this.isMaster = role === 'master'
 });
   }
 

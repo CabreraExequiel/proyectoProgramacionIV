@@ -11,11 +11,11 @@ class AuthController extends Controller
 {
     public function register(Request $request)
     {
-        // Validación
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6|confirmed',
+            'role' => 'required|in:usuario,administrador,master', // ✅ agregar master
         ]);
 
         if ($validator->fails()) {
@@ -30,6 +30,9 @@ class AuthController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+                'role' => $request->role ?? 'usuario', // si no llega, por defecto 'usuario'
+
+
         ]);
 
         //Cambio hecho: Le agregué token al register para que después del registro ya se obtenga el token y no haya que loguearse aparte

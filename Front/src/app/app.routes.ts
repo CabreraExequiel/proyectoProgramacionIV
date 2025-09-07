@@ -7,6 +7,7 @@ import { LoginComponent } from './componentes/login/login.component';
 import { DashboardComponent } from './componentes/dashboard/dashboard.component';
 import { ReservasComponent } from './componentes/reservas/reservas.component';
 import { CanchasComponent } from './componentes/canchas/canchas.component';
+import { RegisterComponent } from './componentesReutilizables/register/register.component';
 
 
 export const routes: Routes = [
@@ -24,6 +25,7 @@ export const routes: Routes = [
 
     ] 
   }, 
+  { path: 'register', component: RegisterComponent },
   { path: 'login', component: LoginComponent },
   { path: '**', redirectTo: '', pathMatch: 'full' } ,
 
