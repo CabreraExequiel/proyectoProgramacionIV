@@ -1,74 +1,167 @@
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<div class="container mt-4">
+  <h2 class="mb-3 text-center">Gestión de Reservas</h2>
 
-<div class="reserva-container">
-  <h2>📅 Reservar Cancha</h2>
+  <!-- Botón para mostrar formulario -->
+  <div *ngIf="!mostrarFormulario" class="mb-3">
+    <button class="btn btn-primary" (click)="toggleFormulario()">
+      ➕ Agregar Reserva
+    </button>
+  </div>
 
+  <!-- Mensajes de éxito o error -->
   <div *ngIf="mensaje" class="alert alert-success">
     {{ mensaje }}
   </div>
 
   <div *ngIf="erroresBackend" class="alert alert-danger">
-  <ul>
-    <li *ngFor="let err of erroresBackend | keyvalue">
-      {{ err.key }}: {{ getPrimerError(err.key) }}
-    </li>
-  </ul>
+    <ul>
+      <li *ngFor="let err of erroresBackend | keyvalue">
+        {{ err.key }}: {{ getPrimerError(err.key) }}
+      </li>
+    </ul>
+  </div>
+
+  <!-- Formulario de Reserva -->
+  <div *ngIf="mostrarFormulario" class="card p-3 mb-4 shadow-sm">
+    <h4 class="mb-3">Nueva Reserva</h4>
+    <form [formGroup]="reservaForm" (ngSubmit)="confirmarReserva()">
+      <div class="row g-3">
+        <!-- Cliente -->
+        <div class="col-md-4">
+          <label class="form-label" for="cliente">Cliente</label>
+          <input
+            id="cliente"
+            type="text"
+            class="form-control"
+            formControlName="cliente"
+            placeholder="Nombre del cliente"
+          />
+        </div>
+
+        <!-- Teléfono -->
+        <div class="col-md-4">
+          <label class="form-label" for="telefono">Teléfono</label>
+          <input
+            id="telefono"
+            type="text"
+            class="form-control"
+            formControlName="telefono"
+            placeholder="Ej: 1123456789"
+          />
+        </div>
+
+        <!-- Cancha -->
+        <div class="col-md-4">
+          <label class="form-label" for="cancha_id">Cancha</label>
+          <select id="cancha_id" formControlName="cancha_id" class="form-select">
+            <option value="">-- Seleccione cancha --</option>
+            <option *ngFor="let cancha of canchas" [value]="cancha.id">
+              {{ cancha.nombre }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Fecha -->
+        <div class="col-md-4">
+          <label class="form-label" for="fecha">Fecha</label>
+          <input
+            id="fecha"
+            type="date"
+            class="form-control"
+            formControlName="fecha"
+            (change)="cargarHorarios()"
+          />
+        </div>
+
+        <!-- Hora inicio -->
+        <div class="col-md-4">
+          <label class="form-label" for="hora_inicio">Hora inicio</label>
+          <select id="hora_inicio" formControlName="hora_inicio" class="form-select">
+            <option value="">-- Seleccione hora --</option>
+            <option *ngFor="let hora of horarios" [value]="hora">
+              {{ hora }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Hora fin -->
+        <div class="col-md-4">
+          <label class="form-label" for="hora_fin">Hora fin</label>
+          <select id="hora_fin" formControlName="hora_fin" class="form-select">
+            <option value="">-- Seleccione hora --</option>
+            <option *ngFor="let hora of horarios" [value]="hora">
+              {{ hora }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Estado -->
+        <div class="col-md-4">
+          <label class="form-label" for="estado">Estado</label>
+          <select id="estado" formControlName="estado" class="form-select">
+            <option value="activa">Activa</option>
+            <option value="pendiente">Pendiente</option>
+            <option value="cancelada">Cancelada</option>
+          </select>
+        </div>
+
+        <!-- Botones -->
+        <div class="col-md-12 text-center mt-3">
+          <button
+            type="submit"
+            class="btn btn-success me-2"
+            [disabled]="reservaForm.invalid"
+          >
+            Confirmar Reserva
+          </button>
+          <button type="button" class="btn btn-secondary" (click)="toggleFormulario()">
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Tabla de Reservas -->
+<table class="table table-bordered table-striped" *ngIf="!mostrarFormulario && reservas.length > 0">
+  <thead>
+    <tr>
+      <th>Cliente</th>
+      <th>Teléfono</th>
+      <th>Cancha</th>
+      <th>Fecha</th>
+      <th>Hora Inicio</th>
+      <th>Hora Fin</th>
+      <th>Estado</th>
+
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let reserva of reservas">
+      <td>{{ reserva.cliente }}</td>
+      <td>{{ reserva.telefono }}</td>
+      <td>{{ reserva.cancha?.nombre || '-' }}</td>
+      <td>{{ reserva.fecha | date:'dd/MM/yyyy' }}</td>
+      <td>{{ reserva.hora_inicio }}</td>
+      <td>{{ reserva.hora_fin }}</td>
+      <td>
+        <span
+          class="badge"
+          [ngClass]="{
+            'bg-success': reserva.estado === 'activa',
+            'bg-warning text-dark': reserva.estado === 'pendiente',
+            'bg-danger': reserva.estado === 'cancelada'
+          }"
+        >
+          {{ reserva.estado }}
+        </span>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<div *ngIf="!mostrarFormulario && reservas.length === 0" class="alert alert-info">
+  No hay reservas disponibles.
 </div>
 
-  <form [formGroup]="reservaForm" (ngSubmit)="confirmarReserva()">
-    <div class="form-group">
-      <label>Cliente:</label>
-      <input type="text" formControlName="cliente" class="form-control">
-    </div>
-
-    <div class="form-group">
-      <label>Teléfono:</label>
-      <input type="text" formControlName="telefono" class="form-control">
-    </div>
-
-    <div class="form-group">
-      <label>Cancha:</label>
-      <select formControlName="cancha_id" class="form-control">
-        <option value="">-- Seleccione cancha --</option>
-        <option *ngFor="let cancha of canchas" [value]="cancha.id">{{ cancha.nombre }}</option>
-      </select>
-    </div>
-
-    <div class="form-group">
-      <label>Fecha:</label>
-      <input type="date" formControlName="fecha" class="form-control" (change)="cargarHorarios()">
-    </div>
-
-    <div class="form-group">
-      <label>Hora inicio:</label>
-      <select formControlName="hora_inicio" class="form-control">
-        <option value="">-- Seleccione hora --</option>
-        <option *ngFor="let hora of horarios" [value]="hora">{{ hora }}</option>
-      </select>
-    </div>
-
-    <div class="form-group">
-      <label>Hora fin:</label>
-      <select formControlName="hora_fin" class="form-control">
-        <option value="">-- Seleccione hora --</option>
-        <option *ngFor="let hora of horarios" [value]="hora">{{ hora }}</option>
-      </select>
-    </div>
-
-    <div class="form-group">
-      <label>Estado:</label>
-      <select formControlName="estado" class="form-control">
-        <option value="activa">Activa</option>
-        <option value="cancelada">Cancelada</option>
-        <option value="pendiente">Pendiente</option>
-      </select>
-    </div>
-   <div class="text-center mt-2">
-    <button type="submit" class="btn-confirmar" [disabled]="reservaForm.invalid">
-        Confirmar Reserva
-    </button>
-    </div>
-  </form>
 </div>
-
-
