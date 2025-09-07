@@ -16,7 +16,9 @@ export class ReservaService {
   getCanchas(): Observable<any> {
     return this.http.get(`${this.apiUrl}/canchas2`);
   }
-
+  getReservas(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/reservas`);
+  }
   getHorarios(fecha: string): Observable<any> {
     return this.http.get(`${this.apiUrl}/horarios?fecha=${fecha}`);
   }
