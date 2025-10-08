@@ -22,6 +22,8 @@ currentUserRole$ = this.userRole.asObservable();
   this.saveToken(res.access_token); // ✅ Coincide con tu backend
   localStorage.setItem('user_role', res.user.role);
   this.userRole.next(res.user.role);
+  localStorage.setItem('usuario', JSON.stringify(res.user));
+
 })
 
   );
@@ -39,6 +41,8 @@ currentUserRole$ = this.userRole.asObservable();
   logout(): void {
   localStorage.removeItem('access_token');
   localStorage.removeItem('user_role'); // <--- limpiar rol
+  localStorage.removeItem('usuario'); // ✅ limpiar usuario guardado
+
   this.loggedIn.next(false);
   this.userRole.next('');
 }
@@ -46,4 +50,10 @@ currentUserRole$ = this.userRole.asObservable();
   isLoggedIn(): boolean {
     return !!this.getToken();
   }
+
+getUsuario(): { id: number; name: string; email: string; role: string } | null {
+  const usuario = localStorage.getItem('usuario');
+  return usuario ? JSON.parse(usuario) : null;
+}
+
 }

@@ -1,0 +1,712 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API en Laravel",
+        "description": "Documentación de la API con Swagger en Laravel",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://127.0.0.1:8000",
+            "description": "Servidor local"
+        }
+    ],
+    "paths": {
+        "/api/register": {
+            "post": {
+                "tags": [
+                    "Autenticación"
+                ],
+                "summary": "Registrar nuevo usuario",
+                "operationId": "8a56853624e025573120a09a4c75d468",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password",
+                                    "password_confirmation",
+                                    "role"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Juan Pérez"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "juan@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "secret123"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "secret123"
+                                    },
+                                    "role": {
+                                        "type": "string",
+                                        "enum": [
+                                            "usuario",
+                                            "administrador",
+                                            "master"
+                                        ],
+                                        "example": "usuario"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Usuario registrado correctamente"
+                    },
+                    "422": {
+                        "description": "Errores de validación"
+                    }
+                }
+            }
+        },
+        "/api/auth/login": {
+            "post": {
+                "tags": [
+                    "Autenticación"
+                ],
+                "summary": "Iniciar sesión",
+                "operationId": "8dcb70df1020986038d098cc08d05dae",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "juan@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "secret123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login exitoso"
+                    },
+                    "401": {
+                        "description": "Credenciales inválidas"
+                    },
+                    "422": {
+                        "description": "Errores de validación"
+                    }
+                }
+            }
+        },
+        "/api/canchas": {
+            "get": {
+                "tags": [
+                    "Canchas"
+                ],
+                "summary": "Obtener todas las canchas",
+                "operationId": "66345b55fe4ab35da0ede769cd0169d6",
+                "responses": {
+                    "200": {
+                        "description": "Lista de canchas"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Canchas"
+                ],
+                "summary": "Crear una nueva cancha",
+                "operationId": "4bf41fcb147200beb321c239201d2a66",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "nombre",
+                                    "tipo"
+                                ],
+                                "properties": {
+                                    "nombre": {
+                                        "type": "string",
+                                        "example": "Cancha 1"
+                                    },
+                                    "tipo": {
+                                        "type": "string",
+                                        "example": "Fútbol 5"
+                                    },
+                                    "precio_hora": {
+                                        "type": "number",
+                                        "example": 1200
+                                    },
+                                    "cant_jugadores": {
+                                        "type": "integer",
+                                        "example": 10
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Cancha creada correctamente"
+                    },
+                    "422": {
+                        "description": "Error de validación"
+                    }
+                }
+            }
+        },
+        "/api/canchas/{id}": {
+            "get": {
+                "tags": [
+                    "Canchas"
+                ],
+                "summary": "Obtener una cancha por ID",
+                "operationId": "8e89ea5e7dd08fde57cc715feec36f69",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Datos de la cancha"
+                    },
+                    "404": {
+                        "description": "Cancha no encontrada"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Canchas"
+                ],
+                "summary": "Actualizar una cancha existente",
+                "operationId": "2ce8d67cdb2111588a015ee9e6f3dece",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "nombre": {
+                                        "type": "string",
+                                        "example": "Cancha 1"
+                                    },
+                                    "tipo": {
+                                        "type": "string",
+                                        "example": "Fútbol 7"
+                                    },
+                                    "precio_hora": {
+                                        "type": "number",
+                                        "example": 1500
+                                    },
+                                    "cant_jugadores": {
+                                        "type": "integer",
+                                        "example": 14
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Cancha actualizada correctamente"
+                    },
+                    "404": {
+                        "description": "Cancha no encontrada"
+                    },
+                    "422": {
+                        "description": "Error de validación"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Canchas"
+                ],
+                "summary": "Eliminar una cancha",
+                "operationId": "ebd34eca3b6f34be6dc4f9853fd605d8",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Cancha eliminada correctamente"
+                    },
+                    "404": {
+                        "description": "Cancha no encontrada"
+                    }
+                }
+            }
+        },
+        "/api/reservas": {
+            "get": {
+                "tags": [
+                    "Reservas"
+                ],
+                "summary": "Listar reservas",
+                "operationId": "8536ca90a9f5ba3709643c0493395478",
+                "parameters": [
+                    {
+                        "name": "user_id",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "estado",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de reservas"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Reservas"
+                ],
+                "summary": "Crear una nueva reserva",
+                "operationId": "3b0d25aeb18200cc0887c6cb9d929934",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "cliente",
+                                    "telefono",
+                                    "fecha",
+                                    "hora_inicio",
+                                    "hora_fin",
+                                    "cancha_id",
+                                    "estado"
+                                ],
+                                "properties": {
+                                    "cliente": {
+                                        "type": "string"
+                                    },
+                                    "telefono": {
+                                        "type": "string"
+                                    },
+                                    "fecha": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "hora_inicio": {
+                                        "type": "string"
+                                    },
+                                    "hora_fin": {
+                                        "type": "string"
+                                    },
+                                    "cancha_id": {
+                                        "type": "integer"
+                                    },
+                                    "estado": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Reserva creada correctamente"
+                    },
+                    "401": {
+                        "description": "Usuario no autenticado"
+                    },
+                    "409": {
+                        "description": "Conflicto de horario"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/horarios": {
+            "get": {
+                "tags": [
+                    "Reservas"
+                ],
+                "summary": "Obtener horarios disponibles",
+                "operationId": "8bc4531aae97c1ed5d69ae2660c697c2",
+                "parameters": [
+                    {
+                        "name": "fecha",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "canchaId",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de horarios disponibles"
+                    },
+                    "400": {
+                        "description": "Fecha y cancha son requeridas"
+                    }
+                }
+            }
+        },
+        "/api/reservas/metrics": {
+            "get": {
+                "tags": [
+                    "Estadísticas"
+                ],
+                "summary": "Obtener métricas de ocupación",
+                "operationId": "86768e3eac3e9b0fa3bf1cc0cf525e2a",
+                "responses": {
+                    "200": {
+                        "description": "Métricas de ocupación"
+                    }
+                }
+            }
+        },
+        "/api/reservas/activas": {
+            "get": {
+                "tags": [
+                    "Reservas"
+                ],
+                "summary": "Obtener reservas activas",
+                "operationId": "72f638d3b480c812a5bd6f56e3eba0a2",
+                "responses": {
+                    "200": {
+                        "description": "Lista de reservas activas"
+                    }
+                }
+            }
+        },
+        "/api/reservations": {
+            "get": {
+                "tags": [
+                    "Reservas"
+                ],
+                "summary": "Obtener reservas activas por usuario",
+                "operationId": "016686cc70085d7636f70c21c626fc4a",
+                "parameters": [
+                    {
+                        "name": "user_id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Reservas activas del usuario"
+                    }
+                }
+            }
+        },
+        "/api/reservas/pendientes": {
+            "get": {
+                "tags": [
+                    "Reservas"
+                ],
+                "summary": "Obtener reservas pendientes",
+                "operationId": "ef3463be7d425eb516ffba1e90e3a6d4",
+                "responses": {
+                    "200": {
+                        "description": "Lista de reservas pendientes"
+                    }
+                }
+            }
+        },
+        "/api/reservas/{id}/estado": {
+            "put": {
+                "tags": [
+                    "Reservas"
+                ],
+                "summary": "Actualizar estado de una reserva",
+                "operationId": "5131587a94d21f1cce5bdd31cebe9ed5",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "estado"
+                                ],
+                                "properties": {
+                                    "estado": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Estado actualizado"
+                    }
+                }
+            }
+        },
+        "/api/reservas/ingresos": {
+            "get": {
+                "tags": [
+                    "Estadísticas"
+                ],
+                "summary": "Obtener ingresos mensuales",
+                "operationId": "eb655730a2b6b8efb847887c68122ef9",
+                "responses": {
+                    "200": {
+                        "description": "Ingresos mensuales calculados"
+                    }
+                }
+            }
+        },
+        "/api/users": {
+            "post": {
+                "tags": [
+                    "Usuarios"
+                ],
+                "summary": "Crear un nuevo usuario",
+                "operationId": "592819a0265360b2014512d6dbfaf0e7",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password"
+                                    },
+                                    "role": {
+                                        "type": "string",
+                                        "example": "usuario"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Usuario creado correctamente"
+                    }
+                }
+            }
+        },
+        "/api/users/{id}": {
+            "put": {
+                "tags": [
+                    "Usuarios"
+                ],
+                "summary": "Actualizar un usuario existente",
+                "operationId": "b9091397c8b25f12c6adb74be6ce3a5a",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password"
+                                    },
+                                    "role": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Usuario actualizado correctamente"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Usuarios"
+                ],
+                "summary": "Eliminar un usuario",
+                "operationId": "fa56cffde745d3f152f95cbacd936c0b",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Usuario eliminado correctamente"
+                    }
+                }
+            }
+        },
+        "/api/usuarios-registrados": {
+            "get": {
+                "tags": [
+                    "Usuarios"
+                ],
+                "summary": "Obtener lista de usuarios registrados",
+                "operationId": "8bff2980165735f8f8aebb1f4e1d0792",
+                "responses": {
+                    "200": {
+                        "description": "Lista de usuarios"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "description": "Usa un token JWT para autenticar",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Autenticación",
+            "description": "Autenticación"
+        },
+        {
+            "name": "Canchas",
+            "description": "Canchas"
+        },
+        {
+            "name": "Reservas",
+            "description": "Reservas"
+        },
+        {
+            "name": "Estadísticas",
+            "description": "Estadísticas"
+        },
+        {
+            "name": "Usuarios",
+            "description": "Usuarios"
+        }
+    ]
+}
