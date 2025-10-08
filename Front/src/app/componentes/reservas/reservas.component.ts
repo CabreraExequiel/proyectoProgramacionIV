@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ReservaService } from '../../services/reserva.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-reservas',
@@ -15,11 +16,15 @@ export class ReservasComponent implements OnInit {
   reservaForm!: FormGroup;
   canchas: any[] = [];
   reservas: any[] = []; 
+  reservasActivas: any[] = [];
+  reservasUsuario: any[] = [];
   horarios: string[] = [];
+  horariosFin: string[] = [];
   mensaje: string = '';
   erroresBackend: { [key: string]: string[] } | null = null;
+  esAdmin: boolean = false; //
 
-  constructor(private fb: FormBuilder, private reservaService: ReservaService) {}
+  constructor(private fb: FormBuilder, private reservaService: ReservaService,  private authService: AuthService) {}
 
   ngOnInit(): void {
     this.reservaForm = this.fb.group({
@@ -32,9 +37,20 @@ export class ReservasComponent implements OnInit {
       estado: ['activa', Validators.required] 
     });
 
-    this.cargarCanchas();
-    this.cargarReservas(); // 👈 Carga inicial de reservas
+    this.reservaForm.get('hora_inicio')?.valueChanges.subscribe(() => {
+      this.filtrarHorariosFin();
+    });
 
+    this.cargarCanchas();
+    const usuario = this.authService.getUsuario();
+    this.esAdmin = usuario?.role === 'administrador'; // 
+
+  if (this.esAdmin) {
+    this.cargarReservas(); //
+    this.cargarReservasActivas(); // 👈 acá
+     } else if (usuario?.id) {
+    this.cargarReservasUsuario(usuario.id);
+  }
   }
 
   // Obtiene el primer error de validación que viene del backend
@@ -58,16 +74,40 @@ export class ReservasComponent implements OnInit {
       error: (err) => console.error('Error cargando reservas:', err),
     });
   }
-  // Cargar horarios disponibles para la fecha seleccionada
-  cargarHorarios() {
-    const fecha = this.reservaForm.get('fecha')?.value;
-    if (!fecha) return;
 
-    this.reservaService.getHorarios(fecha).subscribe({
-      next: (data) => this.horarios = data,
-      error: (err) => console.error('Error al cargar horarios', err)
-    });
-  }
+  cargarReservasActivas() {
+  this.reservaService.getReservasActivas().subscribe({
+    next: (data) => {
+      this.reservasActivas = data;
+    },
+    error: (err) => {
+      console.error('Error al cargar reservas activas', err);
+    }
+  });
+}
+
+
+  cargarReservasUsuario(userId: number) {
+  this.reservaService.getReservasUsuario(userId).subscribe({
+    next: (data) => {
+      this.reservasUsuario = data;
+    },
+    error: (err) => console.error('Error al cargar reservas del usuario', err)
+  });
+}
+
+  // Cargar horarios disponibles para la fecha seleccionada
+cargarHorarios() {
+  const fecha = this.reservaForm.get('fecha')?.value;
+  const canchaId = this.reservaForm.get('cancha_id')?.value;
+
+  if (!fecha || !canchaId) return; // Verificamos que ambos estén presentes
+
+  this.reservaService.getHorarios(fecha, canchaId).subscribe({
+    next: (data) => this.horarios = data,
+    error: (err) => console.error('Error al cargar horarios', err)
+  });
+}
 
   // Mostrar u ocultar el formulario
   toggleFormulario() {
@@ -99,4 +139,18 @@ export class ReservasComponent implements OnInit {
       }
     });
   }
+  filtrarHorariosFin() {
+  const inicio = this.reservaForm.get('hora_inicio')?.value;
+  if (!inicio) {
+    this.horariosFin = [...this.horarios];
+    return;
+  }
+
+  const inicioHora = parseInt(inicio.split(':')[0], 10);
+  this.horariosFin = this.horarios.filter(h => {
+    const hora = parseInt(h.split(':')[0], 10);
+    return hora > inicioHora;
+  });
+}
+
 }

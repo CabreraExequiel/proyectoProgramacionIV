@@ -29,7 +29,7 @@ export class DashboardService {
   return this.http.get<any[]>(`${this.apiUrl}/usuarios-registrados`);
 }
  getReservasPendientes(): Observable<any[]> {
-  return this.http.get<any[]>(`${this.apiUrl}/reservas-pendientes`);
+  return this.http.get<any[]>(`${this.apiUrl}/reservas/pendientes`);
 }
 
 actualizarEstadoReserva(id: number, nuevoEstado: string): Observable<any> {
