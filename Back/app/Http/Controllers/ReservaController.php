@@ -9,7 +9,16 @@ use Illuminate\Support\Facades\Auth;
 
 class ReservaController extends Controller
 {
-
+    /**
+     * @OA\Get(
+     *     path="/api/reservas",
+     *     summary="Listar reservas",
+     *     tags={"Reservas"},
+     *     @OA\Parameter(name="user_id", in="query", @OA\Schema(type="integer")),
+     *     @OA\Parameter(name="estado", in="query", @OA\Schema(type="string")),
+     *     @OA\Response(response=200, description="Lista de reservas")
+     * )
+     */  
     public function index(Request $request)
 {
     $query = Reserva::with('cancha');
@@ -31,6 +40,31 @@ class ReservaController extends Controller
         $canchas = Cancha::all();
         return view('reservas.create', compact('canchas'));
     }
+
+    /**
+     * @OA\Post(
+     *     path="/api/reservas",
+     *     summary="Crear una nueva reserva",
+     *     tags={"Reservas"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"cliente","telefono","fecha","hora_inicio","hora_fin","cancha_id","estado"},
+     *             @OA\Property(property="cliente", type="string"),
+     *             @OA\Property(property="telefono", type="string"),
+     *             @OA\Property(property="fecha", type="string", format="date"),
+     *             @OA\Property(property="hora_inicio", type="string"),
+     *             @OA\Property(property="hora_fin", type="string"),
+     *             @OA\Property(property="cancha_id", type="integer"),
+     *             @OA\Property(property="estado", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(response=201, description="Reserva creada correctamente"),
+     *     @OA\Response(response=401, description="Usuario no autenticado"),
+     *     @OA\Response(response=409, description="Conflicto de horario")
+     * )
+     */
 public function store(Request $request)
 {   
     
@@ -54,7 +88,23 @@ public function store(Request $request)
         'cancha_id' => 'required|integer',
         'estado' => 'required|string|max:50',
     ]);
+    // Validación de rango horario
+    if ($request->hora_inicio >= $request->hora_fin) {
+        return response()->json(['error' => 'La hora de inicio debe ser menor que la hora de fin'], 422);
+    }
 
+    // Validación de solapamiento
+    $conflicto = Reserva::where('fecha', $request->fecha)
+        ->where('cancha_id', $request->cancha_id)
+        ->where(function ($q) use ($request) {
+            $q->where('hora_inicio', '<', $request->hora_fin)
+              ->where('hora_fin', '>', $request->hora_inicio);
+        })
+        ->exists();
+
+    if ($conflicto) {
+        return response()->json(['error' => 'Ya existe una reserva en ese horario'], 409);
+    }
     $reserva = new Reserva();
     $reserva->cliente = $request->cliente;
     $reserva->telefono = $request->telefono;
@@ -104,24 +154,59 @@ public function store(Request $request)
         return response()->json(Cancha::all());
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/horarios",
+     *     summary="Obtener horarios disponibles",
+     *     tags={"Reservas"},
+     *     @OA\Parameter(name="fecha", in="query", required=true, @OA\Schema(type="string")),
+     *     @OA\Parameter(name="canchaId", in="query", required=true, @OA\Schema(type="integer")),
+     *     @OA\Response(response=200, description="Lista de horarios disponibles"),
+     *     @OA\Response(response=400, description="Fecha y cancha son requeridas")
+     * )
+     */
 public function getHorarios(Request $request)
 {
     $fecha = $request->query('fecha');
+    $canchaId = $request->query('canchaId');
 
+    if (!$fecha || !$canchaId) {
+        return response()->json(['error' => 'Fecha y cancha son requeridas'], 400);
+    }
+
+    // Lista de horas (00:00 a 23:00)
     $horarios = [];
     for ($h = 0; $h < 24; $h++) {
         $horarios[] = str_pad($h, 2, '0', STR_PAD_LEFT) . ':00';
     }
 
-    $reservados = Reserva::where('fecha', $fecha)
-        ->pluck('hora_inicio')
-        ->toArray();
+    $reservas = Reserva::where('fecha', $fecha)
+        ->where('cancha_id', $canchaId)
+        ->get();
 
-    $disponibles = array_values(array_diff($horarios, $reservados));
+    foreach ($reservas as $reserva) {
+        $horaInicio = intval(substr($reserva->hora_inicio, 0, 2));
+        $horaFin = intval(substr($reserva->hora_fin, 0, 2));
 
-    return response()->json($disponibles);
+        for ($h = $horaInicio; $h < $horaFin; $h++) {
+            $horaStr = str_pad($h, 2, '0', STR_PAD_LEFT) . ':00';
+            if (($key = array_search($horaStr, $horarios)) !== false) {
+                unset($horarios[$key]);
+            }
+        }
+    }
+
+    // Reindexar y devolver
+    return response()->json(array_values($horarios));
 }
-
+    /**
+     * @OA\Get(
+     *     path="/api/reservas/metrics",
+     *     summary="Obtener métricas de ocupación",
+     *     tags={"Estadísticas"},
+     *     @OA\Response(response=200, description="Métricas de ocupación")
+     * )
+     */
     public function getMetrics()
     {
         $totalCanchas = \App\Models\Cancha::count();
@@ -135,6 +220,14 @@ public function getHorarios(Request $request)
         ]);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/reservas/activas",
+     *     summary="Obtener reservas activas",
+     *     tags={"Reservas"},
+     *     @OA\Response(response=200, description="Lista de reservas activas")
+     * )
+     */
    public function getReservasActivas()
 {
     $reservas = Reserva::with('cancha')
@@ -153,6 +246,16 @@ public function getHorarios(Request $request)
     return response()->json($reservas);
 }
 
+    /**
+     * @OA\Get(
+     *     path="/api/reservations",
+     *     summary="Obtener reservas activas por usuario",
+     *     tags={"Reservas"},
+     *     @OA\Parameter(name="user_id", in="query", required=true, @OA\Schema(type="integer")),
+     *     @OA\Response(response=200, description="Reservas activas del usuario")
+     * )
+     */
+
 public function getReservasActivasPorUsuario(Request $request)
 {
     $userId = $request->query('user_id');
@@ -166,6 +269,14 @@ public function getReservasActivasPorUsuario(Request $request)
 }
 
 
+    /**
+     * @OA\Get(
+     *     path="/api/reservas/pendientes",
+     *     summary="Obtener reservas pendientes",
+     *     tags={"Reservas"},
+     *     @OA\Response(response=200, description="Lista de reservas pendientes")
+     * )
+     */
 public function getReservasPendientes()
 {
     $reservas = Reserva::with('cancha')
@@ -184,6 +295,22 @@ public function getReservasPendientes()
 
     return response()->json($reservas);
 }
+    /**
+     * @OA\Put(
+     *     path="/api/reservas/{id}/estado",
+     *     summary="Actualizar estado de una reserva",
+     *     tags={"Reservas"},
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"estado"},
+     *             @OA\Property(property="estado", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="Estado actualizado")
+     * )
+     */
 public function actualizarEstado(Request $request, $id)
 {
     $reserva = Reserva::findOrFail($id);
@@ -192,6 +319,14 @@ public function actualizarEstado(Request $request, $id)
 
     return response()->json(['message' => 'Estado actualizado']);
 }
+    /**
+     * @OA\Get(
+     *     path="/api/reservas/ingresos",
+     *     summary="Obtener ingresos mensuales",
+     *     tags={"Estadísticas"},
+     *     @OA\Response(response=200, description="Ingresos mensuales calculados")
+     * )
+     */
 public function getIngresosMensuales()
 {
     $reservas = \App\Models\Reserva::with('cancha')

@@ -76,12 +76,18 @@
         <!-- Hora inicio -->
         <div class="col-md-4">
           <label class="form-label" for="hora_inicio">Hora inicio</label>
-          <select id="hora_inicio" formControlName="hora_inicio" class="form-select">
+          <select 
+            id="hora_inicio" 
+            formControlName="hora_inicio" 
+            class="form-select"
+            [disabled]="!reservaForm.get('fecha')?.value || !reservaForm.get('cancha_id')?.value"
+          >
             <option value="">-- Seleccione hora --</option>
             <option *ngFor="let hora of horarios" [value]="hora">
               {{ hora }}
             </option>
           </select>
+
         </div>
 
         <!-- Hora fin -->
@@ -89,7 +95,7 @@
           <label class="form-label" for="hora_fin">Hora fin</label>
           <select id="hora_fin" formControlName="hora_fin" class="form-select">
             <option value="">-- Seleccione hora --</option>
-            <option *ngFor="let hora of horarios" [value]="hora">
+            <option *ngFor="let hora of horariosFin" [value]="hora">
               {{ hora }}
             </option>
           </select>
@@ -123,7 +129,8 @@
   </div>
 
   <!-- Tabla de Reservas -->
-<table class="table table-bordered table-striped" *ngIf="!mostrarFormulario && reservas.length > 0">
+   <!-- Mostrar tabla solo si el usuario es admin -->
+<table class="table table-bordered table-striped" *ngIf="!mostrarFormulario && reservasActivas.length > 0 && esAdmin">
   <thead>
     <tr>
       <th>Cliente</th>
@@ -137,7 +144,7 @@
     </tr>
   </thead>
   <tbody>
-    <tr *ngFor="let reserva of reservas">
+    <tr *ngFor="let reserva of reservasActivas">
       <td>{{ reserva.cliente }}</td>
       <td>{{ reserva.telefono }}</td>
       <td>{{ reserva.cancha?.nombre || '-' }}</td>
@@ -160,7 +167,7 @@
   </tbody>
 </table>
 
-<div *ngIf="!mostrarFormulario && reservas.length === 0" class="alert alert-info">
+<div *ngIf="!mostrarFormulario && reservas.length === 0 && esAdmin" class="alert alert-info"> 
   No hay reservas disponibles.
 </div>
 
