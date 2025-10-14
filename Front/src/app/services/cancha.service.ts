@@ -1,10 +1,10 @@
 // archivo: src/app/services/canchas.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface Cancha {
-  id?: number; // opcional para nuevas canchas
+  id?: number;
   nombre: string;
   tipo: string;
   precio_hora?: number;
@@ -16,33 +16,49 @@ export interface Cancha {
 })
 export class CanchasService {
 
-  // ⚡ URL base de tu API Laravel
   private apiUrl = 'http://127.0.0.1:8000/api/canchas2';
+  private tokenKey = 'access_token';
 
   constructor(private http: HttpClient) { }
 
-  // Listar todas las canchas
+  private getAuthHeaders(): HttpHeaders {
+    const token = localStorage.getItem(this.tokenKey);
+    if (token) {
+      return new HttpHeaders({
+        'Authorization': `Bearer ${token}`
+      });
+    }
+    return new HttpHeaders();
+  }
+
   getCanchas(): Observable<Cancha[]> {
     return this.http.get<Cancha[]>(this.apiUrl);
   }
 
-  // Obtener una cancha por id
   getCancha(id: number): Observable<Cancha> {
     return this.http.get<Cancha>(`${this.apiUrl}/${id}`);
   }
 
-  // Crear una nueva cancha
   crearCancha(cancha: Cancha): Observable<Cancha> {
-    return this.http.post<Cancha>(this.apiUrl, cancha);
+    return this.http.post<Cancha>(
+      this.apiUrl, 
+      cancha, 
+      { headers: this.getAuthHeaders() }
+    );
   }
 
-  // Actualizar una cancha existente
   actualizarCancha(id: number, cancha: Cancha): Observable<Cancha> {
-    return this.http.put<Cancha>(`${this.apiUrl}/${id}`, cancha);
+    return this.http.put<Cancha>(
+      `${this.apiUrl}/${id}`, 
+      cancha, 
+      { headers: this.getAuthHeaders() }
+    );
   }
 
-  // Eliminar una cancha
   eliminarCancha(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${id}`);
+    return this.http.delete(
+      `${this.apiUrl}/${id}`, 
+      { headers: this.getAuthHeaders() }
+    );
   }
 }
