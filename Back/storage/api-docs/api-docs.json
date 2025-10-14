@@ -122,13 +122,13 @@
                 }
             }
         },
-        "/api/canchas": {
+        "/api/canchas2": {
             "get": {
                 "tags": [
                     "Canchas"
                 ],
                 "summary": "Obtener todas las canchas",
-                "operationId": "66345b55fe4ab35da0ede769cd0169d6",
+                "operationId": "48d206ad7daadcff95ae95b55a8a2acd",
                 "responses": {
                     "200": {
                         "description": "Lista de canchas"
@@ -140,7 +140,7 @@
                     "Canchas"
                 ],
                 "summary": "Crear una nueva cancha",
-                "operationId": "4bf41fcb147200beb321c239201d2a66",
+                "operationId": "3963bbbd4a28f4dfbbfcd03f3963dad8",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -177,19 +177,30 @@
                     "201": {
                         "description": "Cancha creada correctamente"
                     },
+                    "401": {
+                        "description": "No autenticado (Falta Token)"
+                    },
+                    "403": {
+                        "description": "Acceso denegado (Falta Rol)"
+                    },
                     "422": {
                         "description": "Error de validación"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
-        "/api/canchas/{id}": {
+        "/api/canchas2/{id}": {
             "get": {
                 "tags": [
                     "Canchas"
                 ],
                 "summary": "Obtener una cancha por ID",
-                "operationId": "8e89ea5e7dd08fde57cc715feec36f69",
+                "operationId": "78f77dde1f489a905240d45a50078de6",
                 "parameters": [
                     {
                         "name": "id",
@@ -214,7 +225,7 @@
                     "Canchas"
                 ],
                 "summary": "Actualizar una cancha existente",
-                "operationId": "2ce8d67cdb2111588a015ee9e6f3dece",
+                "operationId": "fa1ab91a1ad1b1ba2b7498c09e41e902",
                 "parameters": [
                     {
                         "name": "id",
@@ -257,20 +268,31 @@
                     "200": {
                         "description": "Cancha actualizada correctamente"
                     },
+                    "401": {
+                        "description": "No autenticado (Falta Token)"
+                    },
+                    "403": {
+                        "description": "Acceso denegado (Falta Rol)"
+                    },
                     "404": {
                         "description": "Cancha no encontrada"
                     },
                     "422": {
                         "description": "Error de validación"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             },
             "delete": {
                 "tags": [
                     "Canchas"
                 ],
                 "summary": "Eliminar una cancha",
-                "operationId": "ebd34eca3b6f34be6dc4f9853fd605d8",
+                "operationId": "ef98a39ac76a0a209090fd0b5f6ee787",
                 "parameters": [
                     {
                         "name": "id",
@@ -285,10 +307,21 @@
                     "200": {
                         "description": "Cancha eliminada correctamente"
                     },
+                    "401": {
+                        "description": "No autenticado (Falta Token)"
+                    },
+                    "403": {
+                        "description": "Acceso denegado (Falta Rol)"
+                    },
                     "404": {
                         "description": "Cancha no encontrada"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/api/reservas": {
@@ -296,7 +329,8 @@
                 "tags": [
                     "Reservas"
                 ],
-                "summary": "Listar reservas",
+                "summary": "Listar todas las reservas (Administrador)",
+                "description": "Listar todas las reservas (Solo ADMIN)",
                 "operationId": "8536ca90a9f5ba3709643c0493395478",
                 "parameters": [
                     {
@@ -317,14 +351,26 @@
                 "responses": {
                     "200": {
                         "description": "Lista de reservas"
+                    },
+                    "401": {
+                        "description": "Usuario no autenticado"
+                    },
+                    "403": {
+                        "description": "Acceso denegado (Requiere Admin)"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             },
             "post": {
                 "tags": [
                     "Reservas"
                 ],
                 "summary": "Crear una nueva reserva",
+                "description": "Crear una nueva reserva (Usuario Autenticado)",
                 "operationId": "3b0d25aeb18200cc0887c6cb9d929934",
                 "requestBody": {
                     "required": true,
@@ -337,8 +383,7 @@
                                     "fecha",
                                     "hora_inicio",
                                     "hora_fin",
-                                    "cancha_id",
-                                    "estado"
+                                    "cancha_id"
                                 ],
                                 "properties": {
                                     "cliente": {
@@ -352,16 +397,19 @@
                                         "format": "date"
                                     },
                                     "hora_inicio": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "10:00"
                                     },
                                     "hora_fin": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "11:00"
                                     },
                                     "cancha_id": {
                                         "type": "integer"
                                     },
                                     "estado": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "pendiente"
                                     }
                                 },
                                 "type": "object"
@@ -378,6 +426,114 @@
                     },
                     "409": {
                         "description": "Conflicto de horario"
+                    },
+                    "422": {
+                        "description": "Error de validación"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/reservas/{reserva}": {
+            "put": {
+                "tags": [
+                    "Reservas"
+                ],
+                "summary": "Actualizar una reserva (Solo ADMIN)",
+                "operationId": "5e205f5f1e4090f29a0e88a2e525a9b6",
+                "parameters": [
+                    {
+                        "name": "reserva",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "cliente": {
+                                        "type": "string"
+                                    },
+                                    "telefono": {
+                                        "type": "string"
+                                    },
+                                    "fecha": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "hora_inicio": {
+                                        "type": "string",
+                                        "example": "10:00:00"
+                                    },
+                                    "hora_fin": {
+                                        "type": "string",
+                                        "example": "11:00:00"
+                                    },
+                                    "cancha_id": {
+                                        "type": "integer"
+                                    },
+                                    "estado": {
+                                        "type": "string",
+                                        "example": "pendiente"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Reserva actualizada correctamente"
+                    },
+                    "403": {
+                        "description": "Acceso denegado. Solo administradores"
+                    },
+                    "404": {
+                        "description": "Reserva no encontrada"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Reservas"
+                ],
+                "summary": "Eliminar una reserva (Solo ADMIN)",
+                "operationId": "4c6d5a08bc012744b5d042940a2d5bea",
+                "parameters": [
+                    {
+                        "name": "reserva",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Reserva eliminada correctamente"
+                    },
+                    "403": {
+                        "description": "Acceso denegado. Solo administradores"
+                    },
+                    "404": {
+                        "description": "Reserva no encontrada"
                     }
                 },
                 "security": [
@@ -427,13 +583,22 @@
                 "tags": [
                     "Estadísticas"
                 ],
-                "summary": "Obtener métricas de ocupación",
+                "summary": "Obtener métricas de ocupación (Administrador)",
+                "description": "Obtener métricas de ocupación (Solo ADMIN)",
                 "operationId": "86768e3eac3e9b0fa3bf1cc0cf525e2a",
                 "responses": {
                     "200": {
                         "description": "Métricas de ocupación"
+                    },
+                    "403": {
+                        "description": "Acceso denegado (Requiere Admin)"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/api/reservas/activas": {
@@ -441,13 +606,22 @@
                 "tags": [
                     "Reservas"
                 ],
-                "summary": "Obtener reservas activas",
+                "summary": "Obtener todas las reservas activas (Administrador)",
+                "description": "Obtener reservas activas (Solo ADMIN)",
                 "operationId": "72f638d3b480c812a5bd6f56e3eba0a2",
                 "responses": {
                     "200": {
                         "description": "Lista de reservas activas"
+                    },
+                    "403": {
+                        "description": "Acceso denegado (Requiere Admin)"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/api/reservations": {
@@ -455,23 +629,22 @@
                 "tags": [
                     "Reservas"
                 ],
-                "summary": "Obtener reservas activas por usuario",
+                "summary": "Obtener reservas activas del usuario autenticado",
+                "description": "Obtener reservas activas por usuario (Usuario Autenticado)",
                 "operationId": "016686cc70085d7636f70c21c626fc4a",
-                "parameters": [
-                    {
-                        "name": "user_id",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "Reservas activas del usuario"
+                    },
+                    "401": {
+                        "description": "Usuario no autenticado"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/api/reservas/pendientes": {
@@ -479,13 +652,22 @@
                 "tags": [
                     "Reservas"
                 ],
-                "summary": "Obtener reservas pendientes",
+                "summary": "Obtener reservas pendientes (Administrador)",
+                "description": "Obtener reservas pendientes (Solo ADMIN)",
                 "operationId": "ef3463be7d425eb516ffba1e90e3a6d4",
                 "responses": {
                     "200": {
                         "description": "Lista de reservas pendientes"
+                    },
+                    "403": {
+                        "description": "Acceso denegado (Requiere Admin)"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/api/reservas/{id}/estado": {
@@ -493,7 +675,7 @@
                 "tags": [
                     "Reservas"
                 ],
-                "summary": "Actualizar estado de una reserva",
+                "summary": "Actualizar estado de una reserva (Solo ADMIN)",
                 "operationId": "5131587a94d21f1cce5bdd31cebe9ed5",
                 "parameters": [
                     {
@@ -515,7 +697,8 @@
                                 ],
                                 "properties": {
                                     "estado": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "aprobada"
                                     }
                                 },
                                 "type": "object"
@@ -526,8 +709,19 @@
                 "responses": {
                     "200": {
                         "description": "Estado actualizado"
+                    },
+                    "403": {
+                        "description": "Acceso denegado (Requiere Admin)"
+                    },
+                    "404": {
+                        "description": "Reserva no encontrada"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/api/reservas/ingresos": {
@@ -535,67 +729,86 @@
                 "tags": [
                     "Estadísticas"
                 ],
-                "summary": "Obtener ingresos mensuales",
+                "summary": "Obtener ingresos mensuales (Solo ADMIN)",
                 "operationId": "eb655730a2b6b8efb847887c68122ef9",
                 "responses": {
                     "200": {
                         "description": "Ingresos mensuales calculados"
+                    },
+                    "403": {
+                        "description": "Acceso denegado (Requiere Admin)"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/api/users": {
-            "post": {
+            "get": {
                 "tags": [
                     "Usuarios"
                 ],
-                "summary": "Crear un nuevo usuario",
-                "operationId": "592819a0265360b2014512d6dbfaf0e7",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "name",
-                                    "email",
-                                    "password"
-                                ],
-                                "properties": {
-                                    "name": {
-                                        "type": "string"
-                                    },
-                                    "email": {
-                                        "type": "string",
-                                        "format": "email"
-                                    },
-                                    "password": {
-                                        "type": "string",
-                                        "format": "password"
-                                    },
-                                    "role": {
-                                        "type": "string",
-                                        "example": "usuario"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
+                "summary": "Listar todos los usuarios (Solo Administrador)",
+                "description": "Listar todos los usuarios (Solo Administrador)",
+                "operationId": "c457726701591d1183b53aa71fc13441",
+                "responses": {
+                    "200": {
+                        "description": "Lista de usuarios"
+                    },
+                    "403": {
+                        "description": "Acceso denegado (Requiere Administrador)"
                     }
                 },
-                "responses": {
-                    "201": {
-                        "description": "Usuario creado correctamente"
+                "security": [
+                    {
+                        "bearerAuth": []
                     }
-                }
+                ]
             }
         },
         "/api/users/{id}": {
+            "get": {
+                "tags": [
+                    "Usuarios"
+                ],
+                "summary": "Obtener un usuario por ID (Solo Administrador)",
+                "description": "Obtener un usuario por ID (Solo Administrador)",
+                "operationId": "36a33ff774d5cba33c039dec2c3e0287",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Datos del usuario"
+                    },
+                    "403": {
+                        "description": "Acceso denegado (Requiere Administrador)"
+                    },
+                    "404": {
+                        "description": "Usuario no encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
             "put": {
                 "tags": [
                     "Usuarios"
                 ],
-                "summary": "Actualizar un usuario existente",
+                "summary": "Actualizar un usuario existente (Solo Administrador)",
                 "operationId": "b9091397c8b25f12c6adb74be6ce3a5a",
                 "parameters": [
                     {
@@ -620,12 +833,9 @@
                                         "type": "string",
                                         "format": "email"
                                     },
-                                    "password": {
-                                        "type": "string",
-                                        "format": "password"
-                                    },
                                     "role": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "administrador"
                                     }
                                 },
                                 "type": "object"
@@ -636,14 +846,22 @@
                 "responses": {
                     "200": {
                         "description": "Usuario actualizado correctamente"
+                    },
+                    "403": {
+                        "description": "Acceso denegado (Requiere Administrador)"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             },
             "delete": {
                 "tags": [
                     "Usuarios"
                 ],
-                "summary": "Eliminar un usuario",
+                "summary": "Eliminar un usuario (Solo Administrador)",
                 "operationId": "fa56cffde745d3f152f95cbacd936c0b",
                 "parameters": [
                     {
@@ -658,8 +876,16 @@
                 "responses": {
                     "200": {
                         "description": "Usuario eliminado correctamente"
+                    },
+                    "403": {
+                        "description": "Acceso denegado (Requiere Administrador)"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/api/usuarios-registrados": {
@@ -667,13 +893,21 @@
                 "tags": [
                     "Usuarios"
                 ],
-                "summary": "Obtener lista de usuarios registrados",
+                "summary": "Obtener lista de usuarios registrados (Solo Administrador)",
                 "operationId": "8bff2980165735f8f8aebb1f4e1d0792",
                 "responses": {
                     "200": {
                         "description": "Lista de usuarios"
+                    },
+                    "403": {
+                        "description": "Acceso denegado (Requiere Administrador)"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         }
     },
