@@ -129,8 +129,8 @@
   </div>
 
   <!-- Tabla de Reservas -->
-   <!-- Mostrar tabla solo si el usuario es admin -->
-<table class="table table-bordered table-striped" *ngIf="!mostrarFormulario && reservasActivas.length > 0 && esAdmin">
+   <!-- Mostrar tabla solo si el usuario es admin o master -->
+<table class="table table-bordered table-striped" *ngIf="!mostrarFormulario && reservasActivas.length > 0 && (esAdmin || esMaster)">
   <thead>
     <tr>
       <th>Cliente</th>
@@ -167,7 +167,7 @@
   </tbody>
 </table>
 
-<div *ngIf="!mostrarFormulario && reservas.length === 0 && esAdmin" class="alert alert-info"> 
+<div *ngIf="!mostrarFormulario && reservasActivas.length === 0 && (esAdmin || esMaster)" class="alert alert-info"> 
   No hay reservas disponibles.
 </div>
 

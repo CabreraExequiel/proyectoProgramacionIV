@@ -27,8 +27,8 @@ class ReservaController extends Controller
      */
     public function index(Request $request)
     {
-        if (auth()->user() && auth()->user()->role !== 'administrador') {
-            return response()->json(['message' => 'Acceso denegado. Se requiere rol de administrador.'], 403);
+        if (auth()->user() && !in_array(auth()->user()->role, ['master', 'administrador'])) {
+            return response()->json(['message' => 'Acceso denegado. Se requiere rol de administrador o master.'], 403);
         }
 
         $query = Reserva::with('cancha');
@@ -153,8 +153,8 @@ class ReservaController extends Controller
     {
         $user = auth()->user();
 
-    if (!$user || $user->role !== 'administrador') {
-        return response()->json(['message' => 'Acceso denegado. Solo administradores pueden modificar reservas.'], 403);
+    if (auth()->user() && !in_array(auth()->user()->role, ['master', 'administrador'])) {
+        return response()->json(['message' => 'Acceso denegado. Se requiere rol de administrador o master.'], 403);
     }
         $validated = $request->validate([
             'cliente' => 'sometimes|required|string|max:255',
@@ -196,10 +196,9 @@ class ReservaController extends Controller
     {
         $user = auth()->user();
 
-    if (!$user || $user->role !== 'administrador') {
-        return response()->json(['message' => 'Acceso denegado. Solo administradores pueden modificar reservas.'], 403);
+   if (auth()->user() && !in_array(auth()->user()->role, ['master', 'administrador'])) {
+        return response()->json(['message' => 'Acceso denegado. Se requiere rol de administrador o master.'], 403);
     }
-
         $reserva->delete();
 
         return response()->json(['message' => 'Reserva eliminada correctamente.'], 200);
@@ -270,10 +269,10 @@ class ReservaController extends Controller
      */
     public function getMetrics()
     {
-        if (auth()->user() && auth()->user()->role !== 'administrador') {
-            return response()->json(['message' => 'Acceso denegado. Se requiere rol de administrador.'], 403);
+        
+        if (auth()->user() && !in_array(auth()->user()->role, ['master', 'administrador'])) {
+            return response()->json(['message' => 'Acceso denegado. Se requiere rol de administrador o master.'], 403);
         }
-
         $totalCanchas = Cancha::count();
         $reservasActivas = Reserva::whereIn('estado', ['aprobada', 'activa'])->count(); 
         $ocupacion = $totalCanchas > 0 ? round(($reservasActivas / $totalCanchas) * 100, 2) : 0;
@@ -299,8 +298,8 @@ class ReservaController extends Controller
      */
     public function getReservasActivas()
     {
-        if (auth()->user() && auth()->user()->role !== 'administrador') {
-            return response()->json(['message' => 'Acceso denegado. Se requiere rol de administrador.'], 403);
+        if (auth()->user() && !in_array(auth()->user()->role, ['master', 'administrador'])) {
+            return response()->json(['message' => 'Acceso denegado. Se requiere rol de administrador o master.'], 403);
         }
 
         $reservas = Reserva::with('cancha')
@@ -364,10 +363,9 @@ class ReservaController extends Controller
      */
     public function getReservasPendientes()
     {
-        if (auth()->user() && auth()->user()->role !== 'administrador') {
-            return response()->json(['message' => 'Acceso denegado. Se requiere rol de administrador.'], 403);
+      if (auth()->user() && !in_array(auth()->user()->role, ['master', 'administrador'])) {
+            return response()->json(['message' => 'Acceso denegado. Se requiere rol de administrador o master.'], 403);
         }
-
         $reservas = Reserva::with('cancha')
             ->where('estado', 'pendiente')
             ->get()
@@ -407,9 +405,9 @@ class ReservaController extends Controller
      */
     public function actualizarEstado(Request $request, $id)
     {
-        if (auth()->user() && auth()->user()->role !== 'administrador') {
-            return response()->json(['message' => 'Acceso denegado. Se requiere rol de administrador.'], 403);
-        }
+           if (auth()->user() && !in_array(auth()->user()->role, ['master', 'administrador'])) {
+                return response()->json(['message' => 'Acceso denegado. Se requiere rol de administrador o master.'], 403);
+            }
 
         $request->validate([
             'estado' => 'required|string|in:pendiente,aprobada,cancelada,activa',
@@ -434,8 +432,8 @@ class ReservaController extends Controller
      */
     public function getIngresosMensuales()
     {
-        if (auth()->user() && auth()->user()->role !== 'administrador') {
-            return response()->json(['message' => 'Acceso denegado. Se requiere rol de administrador.'], 403);
+        if (auth()->user() && !in_array(auth()->user()->role, ['master', 'administrador'])) {
+            return response()->json(['message' => 'Acceso denegado. Se requiere rol de administrador o master.'], 403);
         }
 
         $reservas = Reserva::with('cancha')
