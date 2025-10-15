@@ -9,38 +9,38 @@ use Illuminate\Http\Request;
 class CanchaController2 extends Controller
 {
     // ⚡ Nuevo controlador API para Canchas
-    // 👉 Lo hice separado del que ya estaba, así no rompemos las vistas Blade que armó el equipo.
+    // 👉 Los métodos index y show son públicos. Los de gestión (store, update, destroy)
+    //    están protegidos por TOKEN y requieren un ROL de administrador.
 
     /**
-     * Devuelve todas las canchas en formato JSON
+     * Devuelve todas las canchas en formato JSON (PÚBLICA)
      */
 
     /**
      * @OA\Get(
-     *     path="/api/canchas",
-     *     summary="Obtener todas las canchas",
-     *     tags={"Canchas"},
-     *     @OA\Response(response=200, description="Lista de canchas")
+     * path="/api/canchas2",
+     * summary="Obtener todas las canchas",
+     * tags={"Canchas"},
+     * @OA\Response(response=200, description="Lista de canchas")
      * )
      */
     public function index()
     {
-        // ✔ Cambié return view(...) por return response()->json(...)
         return response()->json(Cancha::all());
     }
 
     /**
-     * Devuelve una cancha por id
+     * Devuelve una cancha por id (PÚBLICA)
      */
 
     /**
      * @OA\Get(
-     *     path="/api/canchas/{id}",
-     *     summary="Obtener una cancha por ID",
-     *     tags={"Canchas"},
-     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
-     *     @OA\Response(response=200, description="Datos de la cancha"),
-     *     @OA\Response(response=404, description="Cancha no encontrada")
+     * path="/api/canchas2/{id}",
+     * summary="Obtener una cancha por ID",
+     * tags={"Canchas"},
+     * @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     * @OA\Response(response=200, description="Datos de la cancha"),
+     * @OA\Response(response=404, description="Cancha no encontrada")
      * )
      */
     public function show($id)
@@ -56,36 +56,42 @@ class CanchaController2 extends Controller
 
 
     /**
-     * Crea una cancha nueva
+     * Crea una cancha nueva (PRIVADA: REQUIERE TOKEN Y ROL ADMIN)
      */
 
     /**
      * @OA\Post(
-     *     path="/api/canchas",
-     *     summary="Crear una nueva cancha",
-     *     tags={"Canchas"},
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\JsonContent(
-     *             required={"nombre", "tipo"},
-     *             @OA\Property(property="nombre", type="string", example="Cancha 1"),
-     *             @OA\Property(property="tipo", type="string", example="Fútbol 5"),
-     *             @OA\Property(property="precio_hora", type="number", example=1200),
-     *             @OA\Property(property="cant_jugadores", type="integer", example=10)
-     *         )
-     *     ),
-     *     @OA\Response(response=201, description="Cancha creada correctamente"),
-     *     @OA\Response(response=422, description="Error de validación")
+     * path="/api/canchas2",
+     * summary="Crear una nueva cancha",
+     * tags={"Canchas"},
+     * security={{"bearerAuth":{}}}, 
+     * @OA\RequestBody(
+     * required=true,
+     * @OA\JsonContent(
+     * required={"nombre", "tipo"},
+     * @OA\Property(property="nombre", type="string", example="Cancha 1"),
+     * @OA\Property(property="tipo", type="string", example="Fútbol 5"),
+     * @OA\Property(property="precio_hora", type="number", example=1200),
+     * @OA\Property(property="cant_jugadores", type="integer", example=10)
+     * )
+     * ),
+     * @OA\Response(response=201, description="Cancha creada correctamente"),
+     * @OA\Response(response=401, description="No autenticado (Falta Token)"),
+     * @OA\Response(response=403, description="Acceso denegado (Falta Rol)"),
+     * @OA\Response(response=422, description="Error de validación")
      * )
      */
     public function store(Request $request)
     {
-        // ✔ Valido datos básicos (se puede extender después)
+        if (auth()->user() && !in_array(auth()->user()->role, ['master', 'administrador'])) {
+            return response()->json(['message' => 'Acceso denegado. Se requiere rol de administrador o master.'], 403);
+        }
+
         $validated = $request->validate([
-            'nombre' => 'required|string',
-            'tipo'   => 'required|string',
-            'precio_hora' => 'numeric',
-            'cant_jugadores'=> 'integer',
+            'nombre' => 'required|string|max:255',
+            'tipo' 	 => 'required|string|max:255',
+            'precio_hora' => 'numeric|min:0',
+            'cant_jugadores'=> 'integer|min:2',
         ]);
 
         $cancha = Cancha::create($validated);
@@ -94,65 +100,82 @@ class CanchaController2 extends Controller
     }
 
     /**
-     * Actualiza una cancha existente
+     * Actualiza una cancha existente (PRIVADA: REQUIERE TOKEN Y ROL ADMIN)
      */
 
     /**
      * @OA\Put(
-     *     path="/api/canchas/{id}",
-     *     summary="Actualizar una cancha existente",
-     *     tags={"Canchas"},
-     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\JsonContent(
-     *             @OA\Property(property="nombre", type="string", example="Cancha 1"),
-     *             @OA\Property(property="tipo", type="string", example="Fútbol 7"),
-     *             @OA\Property(property="precio_hora", type="number", example=1500),
-     *             @OA\Property(property="cant_jugadores", type="integer", example=14)
-     *         )
-     *     ),
-     *     @OA\Response(response=200, description="Cancha actualizada correctamente"),
-     *     @OA\Response(response=404, description="Cancha no encontrada"),
-     *     @OA\Response(response=422, description="Error de validación")
+     * path="/api/canchas2/{id}",
+     * summary="Actualizar una cancha existente",
+     * tags={"Canchas"},
+     * security={{"bearerAuth":{}}},
+     * @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     * @OA\RequestBody(
+     * required=true,
+     * @OA\JsonContent(
+     * @OA\Property(property="nombre", type="string", example="Cancha 1"),
+     * @OA\Property(property="tipo", type="string", example="Fútbol 7"),
+     * @OA\Property(property="precio_hora", type="number", example=1500),
+     * @OA\Property(property="cant_jugadores", type="integer", example=14)
+     * )
+     * ),
+     * @OA\Response(response=200, description="Cancha actualizada correctamente"),
+     * @OA\Response(response=401, description="No autenticado (Falta Token)"),
+     * @OA\Response(response=403, description="Acceso denegado (Falta Rol)"),
+     * @OA\Response(response=404, description="Cancha no encontrada"),
+     * @OA\Response(response=422, description="Error de validación")
      * )
      */
     public function update(Request $request, $id)
     {
+           if (auth()->user() && !in_array(auth()->user()->role, ['master', 'administrador'])) {
+                return response()->json(['message' => 'Acceso denegado. Se requiere rol de administrador o master.'], 403);
+            }
+        
         $cancha = Cancha::findOrFail($id);
 
         $validated = $request->validate([
-            'nombre' => 'string',
-            'tipo'   => 'string',
-            'precio_hora' => 'numeric',
-            'cant_jugadores'=> 'integer',
-
+            'nombre' => 'string|max:255',
+            'tipo' 	 => 'string|max:255',
+            'precio_hora' => 'numeric|min:0',
+            'cant_jugadores'=> 'integer|min:2',
         ]);
 
+        if (empty($validated)) {
+            return response()->json(['message' => 'No hay datos para actualizar.'], 422);
+        }
+        
         $cancha->update($validated);
 
-         return response()->json([
-        'message' => 'Cancha actualizada correctamente',
-        'cancha' => $cancha
-    ]);
+        return response()->json([
+            'message' => 'Cancha actualizada correctamente',
+            'cancha' => $cancha
+        ]);
     }
 
     /**
-     * Elimina una cancha
+     * Elimina una cancha (PRIVADA: REQUIERE TOKEN Y ROL ADMIN)
      */
 
     /**
      * @OA\Delete(
-     *     path="/api/canchas/{id}",
-     *     summary="Eliminar una cancha",
-     *     tags={"Canchas"},
-     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
-     *     @OA\Response(response=200, description="Cancha eliminada correctamente"),
-     *     @OA\Response(response=404, description="Cancha no encontrada")
+     * path="/api/canchas2/{id}",
+     * summary="Eliminar una cancha",
+     * tags={"Canchas"},
+     * security={{"bearerAuth":{}}},
+     * @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     * @OA\Response(response=200, description="Cancha eliminada correctamente"),
+     * @OA\Response(response=401, description="No autenticado (Falta Token)"),
+     * @OA\Response(response=403, description="Acceso denegado (Falta Rol)"),
+     * @OA\Response(response=404, description="Cancha no encontrada")
      * )
      */
     public function destroy($id)
     {
+           if (auth()->user() && !in_array(auth()->user()->role, ['master', 'administrador'])) {
+                return response()->json(['message' => 'Acceso denegado. Se requiere rol de administrador o master.'], 403);
+            }
+        
         $cancha = Cancha::findOrFail($id);
         $cancha->delete();
 

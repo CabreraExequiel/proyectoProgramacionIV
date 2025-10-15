@@ -11,11 +11,7 @@ Route::get('/', function () {
 });
 
 
-
-
 Route::get('/clientes-form', function () {
     return view('clientes');
 });
 
-Route::resource('reservas', ReservaController::class);
-Route::resource('canchas', CanchaController::class);
