@@ -23,8 +23,8 @@ class UserController extends Controller
      */
     public function index()
     {
-        if (auth()->user() && auth()->user()->role !== 'administrador') {
-            return response()->json(['message' => 'Acceso denegado. Se requiere rol de administrador.'], 403);
+        if (auth()->user() && !in_array(auth()->user()->role, ['master', 'administrador'])) {
+            return response()->json(['message' => 'Acceso denegado. Se requiere rol de administrador o master.'], 403);
         }
         
         $users = User::select('id', 'name', 'email', 'role', 'created_at')->get();
@@ -47,8 +47,8 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        if (auth()->user() && auth()->user()->role !== 'administrador') {
-            return response()->json(['message' => 'Acceso denegado. Se requiere rol de administrador.'], 403);
+        if (auth()->user() && !in_array(auth()->user()->role, ['master', 'administrador'])) {
+            return response()->json(['message' => 'Acceso denegado. Se requiere rol de administrador o master.'], 403);
         }
         
         return response()->json($user->only(['id', 'name', 'email', 'role', 'created_at']));
@@ -96,8 +96,8 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
-        if (auth()->user() && auth()->user()->role !== 'administrador') {
-            return response()->json(['message' => 'Acceso denegado. Se requiere rol de administrador para modificar usuarios.'], 403);
+        if (auth()->user() && !in_array(auth()->user()->role, ['master', 'administrador'])) {
+            return response()->json(['message' => 'Acceso denegado. Se requiere rol de administrador o master.'], 403);
         }
 
         $validated = $request->validate([
@@ -138,8 +138,8 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
-        if (auth()->user() && auth()->user()->role !== 'administrador') {
-            return response()->json(['message' => 'Acceso denegado. Se requiere rol de administrador.'], 403);
+        if (auth()->user() && !in_array(auth()->user()->role, ['master', 'administrador'])) {
+            return response()->json(['message' => 'Acceso denegado. Se requiere rol de administrador o master.'], 403);
         }
 
         if (auth()->id() === $user->id) {
@@ -167,8 +167,8 @@ class UserController extends Controller
      */
     public function getUsuariosRegistrados()
     {
-        if (auth()->user() && auth()->user()->role !== 'administrador') {
-            return response()->json(['message' => 'Acceso denegado. Se requiere rol de administrador.'], 403);
+        if (auth()->user() && !in_array(auth()->user()->role, ['master', 'administrador'])) {
+            return response()->json(['message' => 'Acceso denegado. Se requiere rol de administrador o maestro.'], 403);
         }
 
         $usuarios = User::select('id', 'name', 'email', 'role', 'created_at')->get();

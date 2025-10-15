@@ -23,6 +23,8 @@ export class ReservasComponent implements OnInit {
   mensaje: string = '';
   erroresBackend: { [key: string]: string[] } | null = null;
   esAdmin: boolean = false; //
+  esMaster: boolean = false; 
+
 
   constructor(private fb: FormBuilder, private reservaService: ReservaService,  private authService: AuthService) {}
 
@@ -44,8 +46,10 @@ export class ReservasComponent implements OnInit {
     this.cargarCanchas();
     const usuario = this.authService.getUsuario();
     this.esAdmin = usuario?.role === 'administrador'; // 
+    this.esMaster = usuario?.role === 'master';
 
-  if (this.esAdmin) {
+
+  if (this.esAdmin || this.esMaster) {
     this.cargarReservas(); //
     this.cargarReservasActivas(); // 👈 acá
      } else if (usuario?.id) {
