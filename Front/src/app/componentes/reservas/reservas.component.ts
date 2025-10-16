@@ -19,6 +19,7 @@ export class ReservasComponent implements OnInit {
   reservasActivas: any[] = [];
   reservasUsuario: any[] = [];
   horarios: string[] = [];
+  horariosOcupados: string[] = [];
   horariosFin: string[] = [];
   mensaje: string = '';
   erroresBackend: { [key: string]: string[] } | null = null;
@@ -105,10 +106,23 @@ cargarHorarios() {
   const fecha = this.reservaForm.get('fecha')?.value;
   const canchaId = this.reservaForm.get('cancha_id')?.value;
 
-  if (!fecha || !canchaId) return; // Verificamos que ambos estén presentes
+  if (!fecha || !canchaId) return;
 
   this.reservaService.getHorarios(fecha, canchaId).subscribe({
-    next: (data) => this.horarios = data,
+    next: (data) => {
+      this.horarios = data;
+
+      // Generar todos los horarios posibles
+      const todosHorarios = [];
+      for (let h = 16; h <= 23; h++) todosHorarios.push(`${h.toString().padStart(2,'0')}:00`);
+      todosHorarios.push('00:00');
+
+      // Determinar horarios ocupados
+      this.horariosOcupados = todosHorarios.filter(h => !data.includes(h));
+
+      // Actualizar opciones de hora_fin
+      this.filtrarHorariosFin();
+    },
     error: (err) => console.error('Error al cargar horarios', err)
   });
 }
@@ -124,37 +138,52 @@ cargarHorarios() {
       this.erroresBackend = null;
     }
   }
-
-  // Confirmar y enviar reserva al backend
   confirmarReserva() {
     if (this.reservaForm.invalid) return;
 
     this.reservaService.crearReserva(this.reservaForm.value).subscribe({
       next: (response) => {
         this.mensaje = response.message;
-        this.toggleFormulario(); // Oculta el formulario después de crear la reserva
+        this.toggleFormulario(); 
+        this.cargarReservasActivas(); 
       },
       error: (err) => {
         if (err.status === 422) {
           this.erroresBackend = err.error.errors;
+        } else if (err.status === 409) {
+          // Conflicto de horario
+          this.erroresBackend = { horario: ['Ya existe una reserva en ese horario'] };
         } else {
-          console.error('Error al crear reserva', err);
+          this.erroresBackend = { general: [err.error?.error || 'Ocurrió un error'] };
         }
       }
     });
   }
-  filtrarHorariosFin() {
+
+
+filtrarHorariosFin() {
   const inicio = this.reservaForm.get('hora_inicio')?.value;
   if (!inicio) {
-    this.horariosFin = [...this.horarios];
+    this.horariosFin = this.horarios.filter(h => !this.horariosOcupados.includes(h));
     return;
   }
 
-  const inicioHora = parseInt(inicio.split(':')[0], 10);
-  this.horariosFin = this.horarios.filter(h => {
-    const hora = parseInt(h.split(':')[0], 10);
-    return hora > inicioHora;
-  });
+  let inicioHora = parseInt(inicio.split(':')[0], 10);
+  let todasOpciones = [...this.horarios];
+  if (!todasOpciones.includes('00:00')) todasOpciones.push('00:00');
+
+  // Filtrar horas mayores a inicio y libres
+  this.horariosFin = todasOpciones
+    .filter(h => {
+      let hora = parseInt(h.split(':')[0], 10);
+      if (h === '00:00') hora = 24;
+      return hora > inicioHora && !this.horariosOcupados.includes(h);
+    })
+    .sort((a, b) => {
+      let horaA = a === '00:00' ? 24 : parseInt(a.split(':')[0], 10);
+      let horaB = b === '00:00' ? 24 : parseInt(b.split(':')[0], 10);
+      return horaA - horaB;
+    });
 }
 
 }
