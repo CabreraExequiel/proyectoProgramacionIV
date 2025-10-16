@@ -73,52 +73,72 @@ class ReservaController extends Controller
      * )
      */
     public function store(Request $request)
-    {
-        $user = auth()->user();
-        if (!$user) {
-            return response()->json([
-                'error' => 'No se detectó usuario autenticado',
-                'token' => $request->header('Authorization')
-            ], 401);
-        }
-
-        $validated = $request->validate([
-            'cliente' => 'required|string|max:255',
-            'telefono' => 'required|string|max:20',
-            'fecha' => 'required|date',
-            'hora_inicio' => 'required|date_format:H:i', 
-            'hora_fin' => 'required|date_format:H:i|after:hora_inicio',
-            'cancha_id' => 'required|integer|exists:canchas,id',
-            'estado' => 'sometimes|string|in:pendiente,aprobada,cancelada,activa',
-
-        ]);
-
-        // Validación de solapamiento
-        $conflicto = Reserva::where('fecha', $request->fecha)
-            ->where('cancha_id', $request->cancha_id)
-            ->where(function ($q) use ($request) {
-                $q->where('hora_inicio', '<', $request->hora_fin)
-                    ->where('hora_fin', '>', $request->hora_inicio);
-            })
-            ->exists();
-
-        if ($conflicto) {
-            return response()->json(['error' => 'Ya existe una reserva en ese horario'], 409);
-        }
-
-        // Crear reserva
-        $reserva = Reserva::create(array_merge($validated, [
-            'user_id' => $user->id,
-            'estado' => $request->estado ?? 'pendiente' 
-        ]));
-        
-
+{
+    $user = auth()->user();
+    if (!$user) {
         return response()->json([
-            'message' => 'Reserva creada correctamente.',
-            'reserva' => $reserva
-        ], 201);
+            'error' => 'No se detectó usuario autenticado',
+            'token' => $request->header('Authorization')
+        ], 401);
     }
 
+    $validated = $request->validate([
+        'cliente' => 'required|string|max:255',
+        'telefono' => 'required|string|max:20',
+        'fecha' => 'required|date',
+        'hora_inicio' => 'required|date_format:H:i',
+        'hora_fin' => [
+            'required',
+            'date_format:H:i',
+            function($attr, $value, $fail) use ($request) {
+                $inicio = Carbon::parse($request->hora_inicio);
+                $fin = Carbon::parse($value);
+
+                if ($fin <= $inicio && !($request->hora_inicio == '23:00' && $value == '00:00')) {
+                    $fail('La hora de fin debe ser posterior a la hora de inicio.');
+                }
+            }
+        ],
+        'cancha_id' => 'required|integer|exists:canchas,id',
+        'estado' => 'sometimes|string|in:pendiente,aprobada,cancelada,activa',
+    ]);
+
+    // Ajustar Carbon para hora_fin que cruza medianoche
+    $horaInicio = Carbon::parse($request->hora_inicio);
+    $horaFin = Carbon::parse($request->hora_fin);
+    if ($horaFin <= $horaInicio) {
+        $horaFin->addDay();
+    }
+
+    // Validación de solapamiento con todas las reservas activas
+    $conflicto = Reserva::where('fecha', $request->fecha)
+        ->where('cancha_id', $request->cancha_id)
+        ->whereIn('estado', ['pendiente', 'aprobada', 'activa'])
+        ->get()
+        ->filter(function($reserva) use ($horaInicio, $horaFin) {
+            $resInicio = Carbon::parse($reserva->hora_inicio);
+            $resFin = Carbon::parse($reserva->hora_fin);
+            if ($resFin <= $resInicio) $resFin->addDay(); 
+
+            return $horaInicio < $resFin && $horaFin > $resInicio;
+        })
+        ->isNotEmpty();
+
+    if ($conflicto) {
+        return response()->json(['error' => 'Ya existe una reserva en ese horario'], 409);
+    }
+
+    // Crear reserva
+    $reserva = Reserva::create(array_merge($validated, [
+        'user_id' => $user->id,
+        'estado' => $request->estado ?? 'pendiente'
+    ]));
+
+    return response()->json([
+        'message' => 'Reserva creada correctamente.',
+        'reserva' => $reserva
+    ], 201);
+}
 
     /**
      * @OA\Put(
@@ -138,8 +158,8 @@ class ReservaController extends Controller
      *         @OA\Property(property="cliente", type="string"),
      *         @OA\Property(property="telefono", type="string"),
      *         @OA\Property(property="fecha", type="string", format="date"),
-     *         @OA\Property(property="hora_inicio", type="string", example="10:00:00"),
-     *         @OA\Property(property="hora_fin", type="string", example="11:00:00"),
+     *         @OA\Property(property="hora_inicio", type="string", example="10:00"),
+     *         @OA\Property(property="hora_fin", type="string", example="11:00"),
      *         @OA\Property(property="cancha_id", type="integer"),
      *         @OA\Property(property="estado", type="string", example="pendiente")
      *     )
@@ -150,30 +170,67 @@ class ReservaController extends Controller
      * )
      */
     public function update(Request $request, Reserva $reserva)
-    {
-        $user = auth()->user();
+{
+    $user = auth()->user();
 
-    if (auth()->user() && !in_array(auth()->user()->role, ['master', 'administrador'])) {
+    if (!$user || !in_array($user->role, ['master', 'administrador'])) {
         return response()->json(['message' => 'Acceso denegado. Se requiere rol de administrador o master.'], 403);
     }
-        $validated = $request->validate([
-            'cliente' => 'sometimes|required|string|max:255',
-            'telefono' => 'sometimes|required|string|max:20',
-            'fecha' => 'sometimes|required|date',
-            'hora_inicio' => 'sometimes|required|date_format:H:i:s',
-            'hora_fin' => 'sometimes|required|date_format:H:i:s|after:hora_inicio',
-            'cancha_id' => 'sometimes|required|integer|exists:canchas,id',
-            'estado' => 'sometimes|required|string|max:50|in:pendiente,aprobada,cancelada,activa',
-        ]);
-        
 
-        $reserva->update($validated);
-        
-        return response()->json([
-            'message' => 'Reserva actualizada correctamente.',
-            'reserva' => $reserva
-        ], 200);
+    $validated = $request->validate([
+        'cliente' => 'sometimes|required|string|max:255',
+        'telefono' => 'sometimes|required|string|max:20',
+        'fecha' => 'sometimes|required|date',
+        'hora_inicio' => 'required|date_format:H:i',
+        'hora_fin' => [
+            'required',
+            'date_format:H:i',
+            function($attr, $value, $fail) use ($request) {
+                $inicio = Carbon::parse($request->hora_inicio);
+                $fin = Carbon::parse($value);
+
+                if ($fin <= $inicio && !($request->hora_inicio == '23:00' && $value == '00:00')) {
+                    $fail('La hora de fin debe ser posterior a la hora de inicio.');
+                }
+            }
+        ],
+        'cancha_id' => 'sometimes|required|integer|exists:canchas,id',
+        'estado' => 'sometimes|required|string|max:50|in:pendiente,aprobada,cancelada,activa',
+    ]);
+
+    $horaInicio = Carbon::parse($request->hora_inicio);
+    $horaFin = Carbon::parse($request->hora_fin);
+    if ($horaFin <= $horaInicio) {
+        $horaFin->addDay();
     }
+
+    // Validación de solapamiento con otras reservas
+    $conflicto = Reserva::where('fecha', $request->fecha ?? $reserva->fecha)
+        ->where('cancha_id', $request->cancha_id ?? $reserva->cancha_id)
+        ->whereIn('estado', ['pendiente', 'aprobada', 'activa'])
+        ->where('id', '!=', $reserva->id) // Excluir la reserva actual
+        ->get()
+        ->filter(function($r) use ($horaInicio, $horaFin) {
+            $resInicio = Carbon::parse($r->hora_inicio);
+            $resFin = Carbon::parse($r->hora_fin);
+            if ($resFin <= $resInicio) $resFin->addDay(); 
+
+            return $horaInicio < $resFin && $horaFin > $resInicio;
+        })
+        ->isNotEmpty();
+
+    if ($conflicto) {
+        return response()->json(['error' => 'Ya existe una reserva en ese horario'], 409);
+    }
+
+    // Actualizar reserva
+    $reserva->update($validated);
+
+    return response()->json([
+        'message' => 'Reserva actualizada correctamente.',
+        'reserva' => $reserva
+    ], 200);
+}
 
     /**
      * @OA\Delete(
@@ -219,42 +276,51 @@ class ReservaController extends Controller
      *     @OA\Response(response=400, description="Fecha y cancha son requeridas")
      * )
      */
-        public function getHorarios(Request $request)
-    {
-        $fecha = $request->query('fecha');
-        $canchaId = $request->query('canchaId');
+        // reservaController.php
 
-        if (!$fecha || !$canchaId) {
-            return response()->json(['error' => 'Fecha y cancha son requeridas'], 400);
-        }
+public function getHorarios(Request $request)
+{
+    $fecha = $request->query('fecha');
+    $canchaId = $request->query('canchaId');
 
-        $horarios = [];
-        for ($h = 0; $h < 24; $h++) {
-            $horarios[] = str_pad($h, 2, '0', STR_PAD_LEFT) . ':00';
-        }
-
-        $reservas = Reserva::where('fecha', $fecha)
-            ->where('cancha_id', $canchaId)
-            ->whereIn('estado', ['pendiente', 'aprobada', 'activa'])
-            ->get(['hora_inicio', 'hora_fin']);
-
-        foreach ($reservas as $reserva) {
-            $horaInicio = Carbon::parse($reserva->hora_inicio)->hour;
-            $horaFin = Carbon::parse($reserva->hora_fin)->hour;
-
-            for ($h = $horaInicio; $h <= $horaFin; $h++) {
-                $horaStr = str_pad($h, 2, '0', STR_PAD_LEFT) . ':00';
-                if (($key = array_search($horaStr, $horarios)) !== false) {
-                    unset($horarios[$key]);
-                }
-            }
-        }
-
-        $horariosDisponibles = array_values($horarios);
-
-        return response()->json($horariosDisponibles);
+    if (!$fecha || !$canchaId) {
+        return response()->json(['error' => 'Fecha y cancha son requeridas'], 400);
     }
 
+    // Horarios posibles (16:00 a 23:00) + 00:00 como límite
+    $todosHorarios = [];
+    for ($h = 16; $h <= 23; $h++) {
+        $todosHorarios[] = str_pad($h, 2, '0', STR_PAD_LEFT) . ':00';
+    }
+    $todosHorarios[] = '00:00';
+
+    // Obtener reservas activas para la cancha y fecha
+    $reservas = Reserva::where('fecha', $fecha)
+        ->where('cancha_id', $canchaId)
+        ->whereIn('estado', ['pendiente', 'aprobada', 'activa'])
+        ->get(['hora_inicio', 'hora_fin']);
+
+    // array de horas ocupadas
+    $horasOcupadas = [];
+    foreach ($reservas as $reserva) {
+        $inicio = Carbon::parse($reserva->hora_inicio);
+        $fin = Carbon::parse($reserva->hora_fin);
+        if ($fin <= $inicio) $fin->addDay(); 
+
+        $hora = clone $inicio;
+        while ($hora < $fin) {
+            $horasOcupadas[] = $hora->format('H:00');
+            $hora->addHour();
+        }
+    }
+
+    // Filtrar horarios libres
+    $horariosLibres = array_values(array_filter($todosHorarios, function($h) use ($horasOcupadas) {
+        return !in_array($h, $horasOcupadas);
+    }));
+
+    return response()->json($horariosLibres);
+}
     /**
      * Obtener métricas de ocupación (Solo ADMIN)
      *
@@ -309,6 +375,7 @@ class ReservaController extends Controller
                 return [
                     'id' => $reserva->id,
                     'cliente' => $reserva->cliente,
+                    'telefono' => $reserva->telefono, // 
                     'cancha' => $reserva->cancha->nombre,
                     'fecha' => $reserva->fecha,
                     'hora_inicio' => $reserva->hora_inicio,
@@ -456,6 +523,7 @@ class ReservaController extends Controller
 
             $precioHora = $reserva->cancha->precio_hora ?? 0;
             $ingresos += $duracionHoras * $precioHora;
+                        
         }
 
         return response()->json(['ingresos' => round($ingresos, 2)]);
