@@ -7,6 +7,10 @@ use App\Models\Cancha;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon; // Para manejo de fechas y horas
+// --- Importar las clases para Mail y Log de notificaciones ---
+use App\Mail\Correo_Ticket_Reserva;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 
 class ReservaController extends Controller
 {
@@ -133,6 +137,20 @@ class ReservaController extends Controller
         'user_id' => $user->id,
         'estado' => $request->estado ?? 'pendiente'
     ]));
+
+    // --- inicio modificación para notificaciones ---
+        // Encolar el correo del ticket de reserva
+        try {
+            //Relaciones 'users' , 'cancha'
+            $reserva->load('user', 'cancha');
+
+            Mail::to($user->email)->send(new Correo_Ticket_Reserva($reserva));
+            
+        } catch (\Exception $e) {
+            // Si la cola falla, no fallar la reserva. Solo registrar el error.
+            Log::error('Error al encolar correo de ticket para reserva_id ' . $reserva->id . ': ' . $e->getMessage());
+        }
+        // --- Fin modificación para notificaciones ---
 
     return response()->json([
         'message' => 'Reserva creada correctamente.',
