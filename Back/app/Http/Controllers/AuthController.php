@@ -7,6 +7,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
+// --- NUEVO: Importar las clases para Mail y Log ---
+use App\Mail\Correo_Bienvenida;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
+
 class AuthController extends Controller
 {
     /**
@@ -54,6 +59,16 @@ class AuthController extends Controller
 
 
         ]);
+
+        // --- Inicio modificación para notificaciones ---
+        // Enviar el correo de bienvenida (Sin cola, asincrono.)
+        try {
+            Mail::to($user->email)->send(new Correo_Bienvenida($user));
+        } catch (\Exception $e) {
+            // Si el correo falla, que no falle el registro. Se registra el error del correo y continua normal
+            Log::error('Error al enviar correo de bienvenida para user_id ' . $user->id . ': ' . $e->getMessage());
+        }
+        // --- Fin modificación para notificaciones ---
 
         //Cambio hecho: Le agregué token al register para que después del registro ya se obtenga el token y no haya que loguearse aparte
         $token = auth('api')->login($user);
