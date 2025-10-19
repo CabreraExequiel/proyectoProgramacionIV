@@ -14,7 +14,8 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::get('/canchas2', [ReservaController::class, 'getCanchas']); // Si es solo para listar
 Route::apiResource('canchas2', CanchaController2::class)->only(['index', 'show']);
 Route::get('/horarios', [ReservaController::class, 'getHorarios']);
-
+Route::get('/disponibilidad-mes', [ReservaController::class, 'getDisponibilidadMes']);
+Route::get('/disponibilidad', [ReservaController::class, 'getDisponibilidad']);
 
 // 2. Grupo de Rutas Protegidas (Requieren un token válido)
 Route::middleware('auth:api')->group(function () {
