@@ -26,11 +26,11 @@ class UserController extends Controller
         if (auth()->user() && !in_array(auth()->user()->role, ['master', 'administrador'])) {
             return response()->json(['message' => 'Acceso denegado. Se requiere rol de administrador o master.'], 403);
         }
-        
+
         $users = User::select('id', 'name', 'email', 'role', 'created_at')->get();
         return response()->json($users);
     }
-    
+
     /**
      * Obtener un usuario por ID (Solo Administrador)
      *
@@ -50,17 +50,17 @@ class UserController extends Controller
         if (auth()->user() && !in_array(auth()->user()->role, ['master', 'administrador'])) {
             return response()->json(['message' => 'Acceso denegado. Se requiere rol de administrador o master.'], 403);
         }
-        
+
         return response()->json($user->only(['id', 'name', 'email', 'role', 'created_at']));
     }
-    
+
     public function store(Request $request)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
-            'role' => 'sometimes|string|in:usuario', 
+            'role' => 'sometimes|string|in:usuario',
         ]);
 
         $user = User::create([
@@ -73,7 +73,7 @@ class UserController extends Controller
 
         return response()->json(['message' => 'Usuario registrado correctamente', 'user' => $user->only(['id', 'name', 'email'])], 201);
     }
-    
+
 
     /**
      * @OA\Put(
@@ -109,14 +109,14 @@ class UserController extends Controller
         ]);
 
         $data = $validated;
-        
+
         // Hashing de contraseña si se proporciona
         if (isset($data['password'])) {
             $data['password'] = Hash::make($data['password']);
         } else {
             unset($data['password']); // No actualizar si no se envía
         }
-        
+
         $user->update($data);
 
         return response()->json([
@@ -147,7 +147,7 @@ class UserController extends Controller
         }
 
         $user->delete();
-        
+
         return response()->json([
             'message' => 'Usuario eliminado correctamente',
             'user_id' => $user->id

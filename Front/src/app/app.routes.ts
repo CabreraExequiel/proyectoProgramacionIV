@@ -1,5 +1,5 @@
 // app.routes.ts
-import {  Routes } from '@angular/router';
+import { Routes } from '@angular/router';
 import { LandingComponent } from './landing/landing.component';
 import { HomeComponent } from './componentes/home/home.component';
 import { InicioComponent } from './componentes/inicio/inicio.component';
@@ -8,7 +8,6 @@ import { DashboardComponent } from './componentes/dashboard/dashboard.component'
 import { ReservasComponent } from './componentes/reservas/reservas.component';
 import { CanchasComponent } from './componentes/canchas/canchas.component';
 import { RegisterComponent } from './componentesReutilizables/register/register.component';
-
 
 export const routes: Routes = [
   { path: '', component: LandingComponent },
@@ -19,15 +18,11 @@ export const routes: Routes = [
       { path: '', redirectTo: 'inicio', pathMatch: 'full' },
       { path: 'inicio', component: InicioComponent },
       { path: 'dashboard', component: DashboardComponent },
-      { path: 'reservas', component: ReservasComponent },  
-      { path: 'canchas', component: CanchasComponent }
-
-
-    ] 
-  }, 
+      { path: 'reservas', component: ReservasComponent },
+      { path: 'canchas', component: CanchasComponent },
+    ],
+  },
   { path: 'register', component: RegisterComponent },
   { path: 'login', component: LoginComponent },
-  { path: '**', redirectTo: '', pathMatch: 'full' } ,
-
-
-]
+  { path: '**', redirectTo: '', pathMatch: 'full' },
+];

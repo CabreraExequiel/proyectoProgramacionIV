@@ -370,7 +370,6 @@
                     "Reservas"
                 ],
                 "summary": "Crear una nueva reserva",
-                "description": "Crear una nueva reserva (Usuario Autenticado)",
                 "operationId": "3b0d25aeb18200cc0887c6cb9d929934",
                 "requestBody": {
                     "required": true,
@@ -387,10 +386,12 @@
                                 ],
                                 "properties": {
                                     "cliente": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "usuario"
                                     },
                                     "telefono": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "1544327689"
                                     },
                                     "fecha": {
                                         "type": "string",
@@ -398,14 +399,15 @@
                                     },
                                     "hora_inicio": {
                                         "type": "string",
-                                        "example": "10:00"
+                                        "example": "16:00"
                                     },
                                     "hora_fin": {
                                         "type": "string",
-                                        "example": "11:00"
+                                        "example": "17:00"
                                     },
                                     "cancha_id": {
-                                        "type": "integer"
+                                        "type": "integer",
+                                        "example": 1
                                     },
                                     "estado": {
                                         "type": "string",
@@ -428,7 +430,36 @@
                         "description": "Conflicto de horario"
                     },
                     "422": {
-                        "description": "Error de validación"
+                        "description": "Error de validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "hora_inicio": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "hora_fin": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -462,10 +493,12 @@
                             "schema": {
                                 "properties": {
                                     "cliente": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "usuario"
                                     },
                                     "telefono": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "1544327689"
                                     },
                                     "fecha": {
                                         "type": "string",
@@ -473,14 +506,15 @@
                                     },
                                     "hora_inicio": {
                                         "type": "string",
-                                        "example": "10:00"
+                                        "example": "16:00"
                                     },
                                     "hora_fin": {
                                         "type": "string",
-                                        "example": "11:00"
+                                        "example": "17:00"
                                     },
                                     "cancha_id": {
-                                        "type": "integer"
+                                        "type": "integer",
+                                        "example": 1
                                     },
                                     "estado": {
                                         "type": "string",
@@ -501,6 +535,38 @@
                     },
                     "404": {
                         "description": "Reserva no encontrada"
+                    },
+                    "422": {
+                        "description": "Error de validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "hora_inicio": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "hora_fin": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -744,6 +810,42 @@
                         "bearerAuth": []
                     }
                 ]
+            }
+        },
+        "/api/disponibilidad-mes": {
+            "get": {
+                "tags": [
+                    "Reservas"
+                ],
+                "summary": "Obtener disponibilidad por día para todo el mes",
+                "operationId": "8484dbf21d74d423e42ca888b1934592",
+                "parameters": [
+                    {
+                        "name": "mes",
+                        "in": "query",
+                        "description": "Formato YYYY-MM",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "canchaId",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Estados de disponibilidad por día (libre, parcial, ocupado)"
+                    },
+                    "400": {
+                        "description": "Mes y cancha son requeridos"
+                    }
+                }
             }
         },
         "/api/users": {

@@ -4,30 +4,30 @@ import { Observable, BehaviorSubject } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
   private apiUrl = 'http://127.0.0.1:8000/api';
   private loggedIn = new BehaviorSubject<boolean>(!!this.getToken());
   loggedIn$ = this.loggedIn.asObservable();
 
-  private userRole = new BehaviorSubject<string>(localStorage.getItem('user_role') || '');
-currentUserRole$ = this.userRole.asObservable();
+  private userRole = new BehaviorSubject<string>(
+    localStorage.getItem('user_role') || ''
+  );
+  currentUserRole$ = this.userRole.asObservable();
 
   constructor(private http: HttpClient) {}
 
   login(credentials: { email: string; password: string }): Observable<any> {
-  return this.http.post(`${this.apiUrl}/auth/login`, credentials).pipe(
-    tap((res: any) => {
-  this.saveToken(res.access_token); // ✅ Coincide con tu backend
-  localStorage.setItem('user_role', res.user.role);
-  this.userRole.next(res.user.role);
-  localStorage.setItem('usuario', JSON.stringify(res.user));
-
-})
-
-  );
-}
+    return this.http.post(`${this.apiUrl}/auth/login`, credentials).pipe(
+      tap((res: any) => {
+        this.saveToken(res.access_token); // ✅ Coincide con tu backend
+        localStorage.setItem('user_role', res.user.role);
+        this.userRole.next(res.user.role);
+        localStorage.setItem('usuario', JSON.stringify(res.user));
+      })
+    );
+  }
 
   saveToken(token: string): void {
     localStorage.setItem('access_token', token);
@@ -39,21 +39,25 @@ currentUserRole$ = this.userRole.asObservable();
   }
 
   logout(): void {
-  localStorage.removeItem('access_token');
-  localStorage.removeItem('user_role'); // <--- limpiar rol
-  localStorage.removeItem('usuario'); // ✅ limpiar usuario guardado
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('user_role'); // <--- limpiar rol
+    localStorage.removeItem('usuario'); // ✅ limpiar usuario guardado
 
-  this.loggedIn.next(false);
-  this.userRole.next('');
-}
+    this.loggedIn.next(false);
+    this.userRole.next('');
+  }
 
   isLoggedIn(): boolean {
     return !!this.getToken();
   }
 
-getUsuario(): { id: number; name: string; email: string; role: string } | null {
-  const usuario = localStorage.getItem('usuario');
-  return usuario ? JSON.parse(usuario) : null;
-}
-
+  getUsuario(): {
+    id: number;
+    name: string;
+    email: string;
+    role: string;
+  } | null {
+    const usuario = localStorage.getItem('usuario');
+    return usuario ? JSON.parse(usuario) : null;
+  }
 }

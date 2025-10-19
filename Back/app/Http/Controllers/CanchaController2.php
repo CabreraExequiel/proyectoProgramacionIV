@@ -89,9 +89,9 @@ class CanchaController2 extends Controller
 
         $validated = $request->validate([
             'nombre' => 'required|string|max:255',
-            'tipo' 	 => 'required|string|max:255',
+            'tipo' => 'required|string|max:255',
             'precio_hora' => 'numeric|min:0',
-            'cant_jugadores'=> 'integer|min:2',
+            'cant_jugadores' => 'integer|min:2',
         ]);
 
         $cancha = Cancha::create($validated);
@@ -128,23 +128,23 @@ class CanchaController2 extends Controller
      */
     public function update(Request $request, $id)
     {
-           if (auth()->user() && !in_array(auth()->user()->role, ['master', 'administrador'])) {
-                return response()->json(['message' => 'Acceso denegado. Se requiere rol de administrador o master.'], 403);
-            }
-        
+        if (auth()->user() && !in_array(auth()->user()->role, ['master', 'administrador'])) {
+            return response()->json(['message' => 'Acceso denegado. Se requiere rol de administrador o master.'], 403);
+        }
+
         $cancha = Cancha::findOrFail($id);
 
         $validated = $request->validate([
             'nombre' => 'string|max:255',
-            'tipo' 	 => 'string|max:255',
+            'tipo' => 'string|max:255',
             'precio_hora' => 'numeric|min:0',
-            'cant_jugadores'=> 'integer|min:2',
+            'cant_jugadores' => 'integer|min:2',
         ]);
 
         if (empty($validated)) {
             return response()->json(['message' => 'No hay datos para actualizar.'], 422);
         }
-        
+
         $cancha->update($validated);
 
         return response()->json([
@@ -172,10 +172,10 @@ class CanchaController2 extends Controller
      */
     public function destroy($id)
     {
-           if (auth()->user() && !in_array(auth()->user()->role, ['master', 'administrador'])) {
-                return response()->json(['message' => 'Acceso denegado. Se requiere rol de administrador o master.'], 403);
-            }
-        
+        if (auth()->user() && !in_array(auth()->user()->role, ['master', 'administrador'])) {
+            return response()->json(['message' => 'Acceso denegado. Se requiere rol de administrador o master.'], 403);
+        }
+
         $cancha = Cancha::findOrFail($id);
         $cancha->delete();
 

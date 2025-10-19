@@ -12,20 +12,19 @@ export interface Cancha {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CanchasService {
-
   private apiUrl = 'http://127.0.0.1:8000/api/canchas2';
   private tokenKey = 'access_token';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   private getAuthHeaders(): HttpHeaders {
     const token = localStorage.getItem(this.tokenKey);
     if (token) {
       return new HttpHeaders({
-        'Authorization': `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       });
     }
     return new HttpHeaders();
@@ -40,25 +39,20 @@ export class CanchasService {
   }
 
   crearCancha(cancha: Cancha): Observable<Cancha> {
-    return this.http.post<Cancha>(
-      this.apiUrl, 
-      cancha, 
-      { headers: this.getAuthHeaders() }
-    );
+    return this.http.post<Cancha>(this.apiUrl, cancha, {
+      headers: this.getAuthHeaders(),
+    });
   }
 
   actualizarCancha(id: number, cancha: Cancha): Observable<Cancha> {
-    return this.http.put<Cancha>(
-      `${this.apiUrl}/${id}`, 
-      cancha, 
-      { headers: this.getAuthHeaders() }
-    );
+    return this.http.put<Cancha>(`${this.apiUrl}/${id}`, cancha, {
+      headers: this.getAuthHeaders(),
+    });
   }
 
   eliminarCancha(id: number): Observable<any> {
-    return this.http.delete(
-      `${this.apiUrl}/${id}`, 
-      { headers: this.getAuthHeaders() }
-    );
+    return this.http.delete(`${this.apiUrl}/${id}`, {
+      headers: this.getAuthHeaders(),
+    });
   }
 }
