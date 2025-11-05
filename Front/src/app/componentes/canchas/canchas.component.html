@@ -118,10 +118,15 @@
               Eliminar
             </button>
 
-            <!-- Usuarios normales o master pueden ver -->
-            <button *ngIf="isUser || isMaster" class="btn btn-primary btn-sm">
-              Ver cancha
-            </button>
+            <!-- Usuarios normales o master pueden reservar -->
+       <!--    <button
+  *ngIf="isUser || isMaster"
+  class="btn btn-primary btn-sm"
+  (click)="irAReservas(cancha.id!)"
+>
+  Reservar
+</button>
+-->
           </div>
         </td>
       </tr>

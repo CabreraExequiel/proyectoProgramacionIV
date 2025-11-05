@@ -4,56 +4,33 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash; // Importado para el cifrado de contraseñas
 
 class UserController extends Controller
 {
-    /**
-     * Listar todos los usuarios (Solo Administrador)
-     *
-     * @OA\Get(
-     * path="/api/users",
-     * summary="Listar todos los usuarios (Solo Administrador)",
-     * tags={"Usuarios"},
-     * security={{"bearerAuth":{}}},
-     * @OA\Response(response=200, description="Lista de usuarios"),
-     * @OA\Response(response=403, description="Acceso denegado (Requiere Administrador)")
-     * )
-     */
-    public function index()
+    // 🔹 Listar todos los usuarios registrados (solo administrador/master)
+    public function getUsuariosRegistrados()
     {
         if (auth()->user() && !in_array(auth()->user()->role, ['master', 'administrador'])) {
             return response()->json(['message' => 'Acceso denegado. Se requiere rol de administrador o master.'], 403);
         }
 
-        $users = User::select('id', 'name', 'email', 'role', 'created_at')->get();
-        return response()->json($users);
+        $usuarios = User::select('id', 'name', 'email', 'telefono', 'role', 'created_at')->get();
+        return response()->json($usuarios);
     }
 
-    /**
-     * Obtener un usuario por ID (Solo Administrador)
-     *
-     * @OA\Get(
-     * path="/api/users/{id}",
-     * summary="Obtener un usuario por ID (Solo Administrador)",
-     * tags={"Usuarios"},
-     * security={{"bearerAuth":{}}},
-     * @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
-     * @OA\Response(response=200, description="Datos del usuario"),
-     * @OA\Response(response=403, description="Acceso denegado (Requiere Administrador)"),
-     * @OA\Response(response=404, description="Usuario no encontrado")
-     * )
-     */
+    // 🔹 Obtener un usuario por ID
     public function show(User $user)
     {
         if (auth()->user() && !in_array(auth()->user()->role, ['master', 'administrador'])) {
             return response()->json(['message' => 'Acceso denegado. Se requiere rol de administrador o master.'], 403);
         }
 
-        return response()->json($user->only(['id', 'name', 'email', 'role', 'created_at']));
+        return response()->json($user->only(['id', 'name', 'email', 'telefono', 'role', 'created_at']));
     }
 
+    // 🔹 Registrar un nuevo usuario (público)
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -66,76 +43,53 @@ class UserController extends Controller
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
-            // 🔒 Hashing obligatorio de la contraseña
             'password' => Hash::make($validated['password']),
-            'role' => 'usuario', // Siempre forzar 'usuario' en la ruta de registro pública
+            'role' => 'usuario',
         ]);
 
         return response()->json(['message' => 'Usuario registrado correctamente', 'user' => $user->only(['id', 'name', 'email'])], 201);
     }
 
-
-    /**
-     * @OA\Put(
-     * path="/api/users/{id}",
-     * summary="Actualizar un usuario existente (Solo Administrador)",
-     * tags={"Usuarios"},
-     * security={{"bearerAuth":{}}},
-     * @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
-     * @OA\RequestBody(
-     * required=true,
-     * @OA\JsonContent(
-     * @OA\Property(property="name", type="string"),
-     * @OA\Property(property="email", type="string", format="email"),
-     * @OA\Property(property="role", type="string", example="administrador") 
-     * )
-     * ),
-     * @OA\Response(response=200, description="Usuario actualizado correctamente"),
-     * @OA\Response(response=403, description="Acceso denegado (Requiere Administrador)")
-     * )
-     */
+    // 🔹 Actualizar datos de usuario o su propio perfil
     public function update(Request $request, User $user)
     {
-        if (auth()->user() && !in_array(auth()->user()->role, ['master', 'administrador'])) {
-            return response()->json(['message' => 'Acceso denegado. Se requiere rol de administrador o master.'], 403);
+        $authUser = auth()->user();
+
+        if (!$authUser) {
+            return response()->json(['message' => 'No autenticado.'], 401);
+        }
+
+        if (!in_array($authUser->role, ['master', 'administrador']) && $authUser->id !== $user->id) {
+            return response()->json(['message' => 'Acceso denegado. No puedes editar otros usuarios.'], 403);
         }
 
         $validated = $request->validate([
             'name' => 'sometimes|required|string|max:255',
-            // Validación de email único, excluyendo al usuario actual
             'email' => 'sometimes|required|string|email|max:255|unique:users,email,' . $user->id,
+            'telefono' => 'sometimes|nullable|string|max:20',
             'password' => 'sometimes|nullable|string|min:8',
-            'role' => 'sometimes|required|string|in:usuario,administrador', // Actualizado
+            'role' => 'sometimes|required|string|in:usuario,administrador,master'
         ]);
 
         $data = $validated;
 
-        // Hashing de contraseña si se proporciona
         if (isset($data['password'])) {
             $data['password'] = Hash::make($data['password']);
-        } else {
-            unset($data['password']); // No actualizar si no se envía
+        }
+
+        if (!in_array($authUser->role, ['master', 'administrador'])) {
+            unset($data['role']);
         }
 
         $user->update($data);
 
         return response()->json([
             'message' => 'Usuario actualizado correctamente',
-            'user' => $user->only(['id', 'name', 'email', 'role'])
+            'user' => $user->only(['id', 'name', 'email', 'telefono', 'role'])
         ], 200);
     }
 
-    /**
-     * @OA\Delete(
-     * path="/api/users/{id}",
-     * summary="Eliminar un usuario (Solo Administrador)",
-     * tags={"Usuarios"},
-     * security={{"bearerAuth":{}}},
-     * @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
-     * @OA\Response(response=200, description="Usuario eliminado correctamente"),
-     * @OA\Response(response=403, description="Acceso denegado (Requiere Administrador)")
-     * )
-     */
+    // 🔹 Eliminar un usuario (solo admin/master)
     public function destroy(User $user)
     {
         if (auth()->user() && !in_array(auth()->user()->role, ['master', 'administrador'])) {
@@ -152,27 +106,5 @@ class UserController extends Controller
             'message' => 'Usuario eliminado correctamente',
             'user_id' => $user->id
         ], 200);
-    }
-
-
-    /**
-     * @OA\Get(
-     * path="/api/usuarios-registrados",
-     * summary="Obtener lista de usuarios registrados (Solo Administrador)",
-     * tags={"Usuarios"},
-     * security={{"bearerAuth":{}}},
-     * @OA\Response(response=200, description="Lista de usuarios"),
-     * @OA\Response(response=403, description="Acceso denegado (Requiere Administrador)")
-     * )
-     */
-    public function getUsuariosRegistrados()
-    {
-        if (auth()->user() && !in_array(auth()->user()->role, ['master', 'administrador'])) {
-            return response()->json(['message' => 'Acceso denegado. Se requiere rol de administrador o maestro.'], 403);
-        }
-
-        $usuarios = User::select('id', 'name', 'email', 'role', 'created_at')->get();
-
-        return response()->json($usuarios);
     }
 }
