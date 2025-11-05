@@ -1,1 +1,46 @@
-<p>usuarios works!</p>
+<div class="usuarios-container">
+  <h2>👥 Usuarios Registrados</h2>
+
+  <!-- 🔹 Estado de carga -->
+  <div *ngIf="cargando" class="cargando">Cargando usuarios...</div>
+
+  <!-- 🔹 Mensaje de error -->
+  <div *ngIf="error" class="error">{{ error }}</div>
+
+  <!-- 🔹 Tabla de usuarios (solo si hay resultados) -->
+  <table *ngIf="!cargando && usuarios.length > 0 && esAdmin" class="tabla-usuarios">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Email</th>
+        <th>Rol</th>
+        <th>Teléfono</th>
+        <th>Fecha Registro</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let u of usuarios">
+        <td>{{ u.id }}</td>
+        <td>{{ u.name }}</td>
+        <td>{{ u.email }}</td>
+        <td>
+          <span [class.admin]="u.role === 'administrador'"
+                [class.usuario]="u.role === 'usuario'">
+            {{ u.role }}
+          </span>
+        </td>
+        <td>{{ u.telefono || '—' }}</td>
+        <td>{{ u.created_at | date: 'dd/MM/yyyy HH:mm' }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- 🔹 Sin usuarios -->
+  <p *ngIf="!cargando && usuarios.length === 0 && esAdmin" class="vacio">
+    No hay usuarios registrados.
+  </p>
+
+  <!-- 🔹 Botón de logout -->
+  <button (click)="cerrarSesion()" class="btn-cerrar">Cerrar sesión</button>
+</div>

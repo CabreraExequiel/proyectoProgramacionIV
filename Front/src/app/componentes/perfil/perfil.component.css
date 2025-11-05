@@ -1,0 +1,91 @@
+.perfil-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 40px;
+}
+
+.perfil-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  width: 350px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.perfil-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+}
+
+.perfil-header {
+  border-bottom: 1px solid #eee;
+  padding-bottom: 16px;
+  margin-bottom: 16px;
+}
+
+.perfil-foto {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 12px;
+}
+
+.perfil-header h2 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 1.6rem;
+}
+
+.email {
+  color: #555;
+  margin: 4px 0;
+}
+
+.rol {
+  color: #007bff;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.perfil-detalles {
+  font-size: 0.95rem;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.perfil-detalles span {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.perfil-acciones {
+  display: flex;
+  justify-content: center;
+}
+
+.btn-cerrar {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s ease;
+}
+
+.btn-cerrar:hover {
+  background-color: #c0392b;
+}
+
+.perfil-vacio {
+  text-align: center;
+  margin-top: 40px;
+  color: #7f8c8d;
+  font-size: 1.1rem;
+}

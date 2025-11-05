@@ -1,28 +1,11 @@
 <div class="container mt-4">
   <h2 class="mb-3 text-center">Gestión de Reservas</h2>
 
-  <div *ngIf="!mostrarFormulario" class="mb-3">
-    <button class="btn btn-primary" (click)="toggleFormulario()">
-      ➕ Agregar Reserva
-    </button>
-  </div>
-
-  <div *ngIf="mensaje" class="alert alert-success">
-    {{ mensaje }}
-  </div>
-
-  <div *ngIf="erroresBackend" class="alert alert-danger">
-    <ul>
-      <li *ngFor="let err of erroresBackend | keyvalue">
-        {{ err.key }}: {{ getPrimerError(err.key) }}
-      </li>
-    </ul>
-  </div>
-
-  <div *ngIf="mostrarFormulario" class="card p-3 mb-4 shadow-sm">
-    <form [formGroup]="reservaForm" (ngSubmit)="confirmarReserva()">
+  <!-- 🟢 Formulario siempre visible (sin botón de agregar) -->
+  <div *ngIf="!esAdmin && !esMaster" class="card p-3 mb-4 shadow-sm">
+  <form [formGroup]="reservaForm" (ngSubmit)="confirmarReserva()">
       <div class="row g-3">
-        <!-- Si es usuario : campo "cliente" readonly -->
+        <!-- Si es usuario: campo "cliente" readonly -->
         <div class="col-md-4" *ngIf="!esAdmin && !esMaster">
           <label class="form-label" for="cliente">Cliente</label>
           <input
@@ -44,10 +27,7 @@
             class="form-select"
           >
             <option value="">-- Seleccione cliente --</option>
-            <option
-              *ngFor="let cliente of usuariosClientes"
-              [value]="cliente.id"
-            >
+            <option *ngFor="let cliente of usuariosClientes" [value]="cliente.id">
               {{ cliente.name }}
             </option>
           </select>
@@ -64,6 +44,7 @@
           />
 
         </div>
+
         <div class="col-md-4">
           <label class="form-label" for="cancha_id">Cancha</label>
           <select
@@ -84,6 +65,7 @@
             <div class="d-flex justify-content-between align-items-center mb-2">
               <button
                 class="btn btn-sm btn-outline-secondary"
+                type="button"
                 (click)="cambiarMes(-1)"
               >
                 ←
@@ -91,6 +73,7 @@
               <h5 class="m-0">{{ mesActualNombre }} {{ anioActual }}</h5>
               <button
                 class="btn btn-sm btn-outline-secondary"
+                type="button"
                 (click)="cambiarMes(1)"
               >
                 →
@@ -115,7 +98,7 @@
                 }"
                 (click)="seleccionarDia(dia)"
               >
-                {{ dia.numero || "" }}
+                {{ dia.numero || '' }}
               </div>
             </div>
           </div>
@@ -138,8 +121,8 @@
                 >
                   {{ hora }}
                   <span *ngIf="horariosOcupados.includes(hora)">
-                    (Ocupado)</span
-                  >
+                    (Ocupado)
+                  </span>
                 </option>
               </select>
             </div>
@@ -159,8 +142,8 @@
                 >
                   {{ hora }}
                   <span *ngIf="horariosOcupados.includes(hora)">
-                    (Ocupado)</span
-                  >
+                    (Ocupado)
+                  </span>
                 </option>
               </select>
             </div>
@@ -175,6 +158,7 @@
             </div>
           </div>
         </div>
+
         <div class="col-md-12 text-center mt-3">
           <button
             type="submit"
@@ -183,24 +167,15 @@
           >
             Confirmar Reserva
           </button>
-
-          <button
-            type="button"
-            class="btn btn-secondary"
-            (click)="toggleFormulario()"
-          >
-            Cancelar
-          </button>
         </div>
       </div>
     </form>
   </div>
 
+  <!-- 🧾 Tabla solo visible para admin/master -->
   <table
     class="table table-bordered table-striped"
-    *ngIf="
-      !mostrarFormulario && reservasActivas.length > 0 && (esAdmin || esMaster)
-    "
+    *ngIf="reservasActivas.length > 0 && (esAdmin || esMaster)"
   >
     <thead>
       <tr>
@@ -217,16 +192,15 @@
       <tr *ngFor="let reserva of reservasActivas">
         <td>{{ reserva.cliente }}</td>
         <td>{{ reserva.telefono }}</td>
-        <td>{{ reserva.cancha || "-" }}</td>
-        <td>{{ reserva.fecha | date : "dd/MM/yyyy" }}</td>
+        <td>{{ reserva.cancha || '-' }}</td>
+        <td>{{ reserva.fecha | date: 'dd/MM/yyyy' }}</td>
         <td>{{ reserva.hora_inicio }}</td>
         <td>{{ reserva.hora_fin }}</td>
         <td>
           <span
             class="badge"
             [ngClass]="{
-              'bg-success':
-                reserva.estado === 'activa' || reserva.estado === 'aprobada',
+              'bg-success': reserva.estado === 'activa' || reserva.estado === 'aprobada',
               'bg-warning text-dark': reserva.estado === 'pendiente',
               'bg-danger': reserva.estado === 'cancelada'
             }"
@@ -239,11 +213,7 @@
   </table>
 
   <div
-    *ngIf="
-      !mostrarFormulario &&
-      reservasActivas.length === 0 &&
-      (esAdmin || esMaster)
-    "
+    *ngIf="reservasActivas.length === 0 && (esAdmin || esMaster)"
     class="alert alert-info"
   >
     No hay reservas disponibles.

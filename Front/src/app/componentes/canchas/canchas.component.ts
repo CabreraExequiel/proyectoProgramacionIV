@@ -10,6 +10,7 @@ import {
 import { Cancha, CanchasService } from '../../services/cancha.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from '../../services/auth.service';
+import { Route, Router } from '@angular/router';
 
 @Component({
   selector: 'app-canchas',
@@ -35,7 +36,8 @@ export class CanchasComponent implements OnInit {
   constructor(
     private canchasService: CanchasService, // 👈 minúscula para convención
     private fb: FormBuilder,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router
   ) {
     this.authService.loggedIn$.subscribe(
       (status) => (this.isLoggedIn = status)
@@ -54,6 +56,7 @@ export class CanchasComponent implements OnInit {
       tipo: ['', Validators.required],
       precio_hora: [0, Validators.required],
       cant_jugadores: [0, Validators.required],
+      id: [0, Validators.required]
     });
   }
 
@@ -71,6 +74,8 @@ export class CanchasComponent implements OnInit {
       },
     });
   }
+
+ 
 
   mostrarFormularioCrear(): void {
     this.mostrarForm = true;
@@ -119,6 +124,16 @@ export class CanchasComponent implements OnInit {
       });
     }
   }
+
+irAReservas(canchaId?: number): void {
+  if (!canchaId) {
+    console.warn('⚠️ ID de cancha no válido');
+    return;
+  }
+
+  // 🔹 Redirige al componente Reservas con el ID de cancha como parámetro
+  this.router.navigate(['/reservas'], { queryParams: { cancha: canchaId } });
+}
 
   eliminarCancha(id: number | undefined): void {
     if (!id) return;

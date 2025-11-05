@@ -1,0 +1,34 @@
+<div class="perfil-container" *ngIf="usuario; else sinUsuario">
+  <div class="perfil-card">
+    <div class="perfil-header">
+      <img
+        src="https://cdn-icons-png.flaticon.com/512/219/219983.png"
+        alt="Foto de perfil"
+        class="perfil-foto"
+      />
+      <h2>{{ usuario.name }}</h2>
+      <p class="email">{{ usuario.email }}</p>
+      <p *ngIf="esAdmin" class="rol">
+        Rol: <strong>{{ usuario.role }}</strong>
+      </p>
+    </div>
+
+    <div class="perfil-detalles">
+      <p><span>Teléfono:</span> {{ usuario.telefono || 'No informado' }}</p>
+      <p>
+        <span>Registrado el:</span>
+        {{ usuario.created_at | date: 'dd/MM/yyyy HH:mm' }}
+      </p>
+    </div>
+
+    <div class="perfil-acciones">
+      <button class="btn-cerrar" (click)="cerrarSesion()">Cerrar Sesión</button>
+    </div>
+  </div>
+</div>
+
+<ng-template #sinUsuario>
+  <div class="perfil-vacio">
+    <p>No hay información del usuario disponible.</p>
+  </div>
+</ng-template>

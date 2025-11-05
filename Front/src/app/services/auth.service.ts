@@ -51,14 +51,15 @@ export class AuthService {
     return !!this.getToken();
   }
 
-  getUsuario(): {
-    id: number;
-    name: string;
-    email: string;
-    telefono: string;
-    role: string;
-  } | null {
-    const usuario = localStorage.getItem('usuario');
-    return usuario ? JSON.parse(usuario) : null;
-  }
+ getUsuario(): {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+  created_at: string; // 🆕 agregado: fecha de registro
+  telefono: number
+} | null {
+  const usuario = localStorage.getItem('usuario');
+  return usuario ? JSON.parse(usuario) : null;
+}
 }
