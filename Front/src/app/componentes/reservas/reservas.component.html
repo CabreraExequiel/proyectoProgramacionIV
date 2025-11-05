@@ -60,8 +60,9 @@
             type="text"
             class="form-control"
             formControlName="telefono"
-            placeholder="Ej: 1123456789"
+            [readonly]="!esAdmin && !esMaster"
           />
+
         </div>
         <div class="col-md-4">
           <label class="form-label" for="cancha_id">Cancha</label>

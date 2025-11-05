@@ -41,6 +41,10 @@
                                         "format": "email",
                                         "example": "juan@example.com"
                                     },
+                                    "telefono": {
+                                        "type": "string",
+                                        "example": "123456789"
+                                    },
                                     "password": {
                                         "type": "string",
                                         "format": "password",
@@ -97,6 +101,10 @@
                                         "type": "string",
                                         "format": "email",
                                         "example": "juan@example.com"
+                                    },
+                                    "telefono": {
+                                        "type": "string",
+                                        "example": "123456789"
                                     },
                                     "password": {
                                         "type": "string",
@@ -934,6 +942,9 @@
                                     "email": {
                                         "type": "string",
                                         "format": "email"
+                                    },
+                                    "telefono": {
+                                        "type": "string"
                                     },
                                     "role": {
                                         "type": "string",

@@ -55,6 +55,7 @@ export class AuthService {
     id: number;
     name: string;
     email: string;
+    telefono: string;
     role: string;
   } | null {
     const usuario = localStorage.getItem('usuario');

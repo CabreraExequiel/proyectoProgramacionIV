@@ -29,6 +29,7 @@ export class RegisterComponent implements OnInit {
   this.registerForm = this.fb.group({
     name: ['', Validators.required],
     email: ['', [Validators.required, Validators.email]],
+    telefono: ['', Validators.required],
     password: ['', [Validators.required, Validators.minLength(6)]],
     password_confirmation: ['', [Validators.required, Validators.minLength(6)]],
     role: ['usuario', Validators.required]
@@ -55,6 +56,7 @@ export class RegisterComponent implements OnInit {
         // Login automático después del registro
         this.authService.login({ email: datos.email, password: datos.password }).subscribe({
           next: () => {
+            
             // Redirigir según rol
             if (datos.role === 'administrador') {
               this.router.navigate(['/home/dashboard']);

@@ -61,18 +61,18 @@ export class ReservasComponent implements OnInit {
     // Solo si NO es admin/master, setea el nombre al FormControl
     if (!this.esAdmin && !this.esMaster && this.usuarioActual) {
       this.reservaForm.get('cliente')?.setValue(this.usuarioActual.name);
+      this.reservaForm.get('telefono')?.setValue(this.usuarioActual.telefono);
+
     }
 
     if (this.esAdmin || this.esMaster) {
-      // Cada vez que cambie el select de cliente_id, pone el nombre en el form
       this.reservaForm.get('cliente_id')?.valueChanges.subscribe(clienteId => {
-        const selected = this.usuariosClientes.find(u => u.id == clienteId);
-        const nombre = selected ? (selected.nombre || selected.name) : '';
-        this.reservaForm.get('cliente')?.setValue(nombre);
-      });
+      const selected = this.usuariosClientes.find(u => u.id == clienteId);
+      this.reservaForm.get('cliente')?.setValue(selected?.name || '');
+      this.reservaForm.get('telefono')?.setValue(selected?.telefono || '');
+    });
+
     }
-
-
 
     //  Si NO es admin o master se bloquea el campo estado y se fuerza a "pendiente"
     if (!this.esAdmin && !this.esMaster) {

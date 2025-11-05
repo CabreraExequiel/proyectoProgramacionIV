@@ -25,6 +25,7 @@ class AuthController extends Controller
      *             required={"name", "email", "password", "password_confirmation", "role"},
      *             @OA\Property(property="name", type="string", example="Juan Pérez"),
      *             @OA\Property(property="email", type="string", format="email", example="juan@example.com"),
+     *             @OA\Property(property="telefono", type="string", example="123456789"),
      *             @OA\Property(property="password", type="string", format="password", example="secret123"),
      *             @OA\Property(property="password_confirmation", type="string", format="password", example="secret123"),
      *             @OA\Property(property="role", type="string", enum={"usuario", "administrador", "master"}, example="usuario")
@@ -39,6 +40,7 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
+            'telefono' => 'required|string|max:20',
             'password' => 'required|string|min:6|confirmed',
             'role' => 'required|in:usuario,administrador,master', // ✅ agregar master
         ]);
@@ -49,16 +51,21 @@ class AuthController extends Controller
                 'errors' => $validator->errors()
             ], 422);
         }
+        
+        Log::info('Datos recibidos en register:', $request->all());
+
 
         // Crea el usuario en la DB
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
+            'telefono' => $request->telefono,
             'password' => Hash::make($request->password),
                 'role' => $request->role ?? 'usuario', // si no llega, por defecto 'usuario'
 
 
         ]);
+
 
         // --- Inicio modificación para notificaciones ---
         // Enviar el correo de bienvenida (Sin cola, asincrono.)
@@ -93,6 +100,7 @@ class AuthController extends Controller
      *         @OA\JsonContent(
      *             required={"email", "password"},
      *             @OA\Property(property="email", type="string", format="email", example="juan@example.com"),
+     *             @OA\Property(property="telefono", type="string", example="123456789"),
      *             @OA\Property(property="password", type="string", format="password", example="secret123")
      *         )
      *     ),
@@ -116,7 +124,7 @@ class AuthController extends Controller
             ], 422);
         }
 
-        $credentials = $request->only('email', 'password');
+        $credentials = $request->only('email', 'password',);
 
         // Intentar autenticar con JWT
         if (!$token = auth('api')->attempt($credentials)) {
@@ -127,12 +135,19 @@ class AuthController extends Controller
         }
 
         return response()->json([
-            'status' => 'success',
-            'message' => 'Login exitoso',
-            'user' => auth('api')->user(),
-            'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => auth('api')->factory()->getTTL() * 60
-        ], 200);
+        'status' => 'success',
+        'message' => 'Login exitoso',
+        'user' => [
+            'id' => auth('api')->user()->id,
+            'name' => auth('api')->user()->name,
+            'email' => auth('api')->user()->email,
+            'telefono' => auth('api')->user()->telefono,  // <-- incluir aquí
+            'role' => auth('api')->user()->role,
+        ],
+        'access_token' => $token,
+        'token_type' => 'bearer',
+        'expires_in' => auth('api')->factory()->getTTL() * 60
+    ], 200);
+
     }
 }

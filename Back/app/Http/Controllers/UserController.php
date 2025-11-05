@@ -27,7 +27,7 @@ class UserController extends Controller
             return response()->json(['message' => 'Acceso denegado. Se requiere rol de administrador o master.'], 403);
         }
 
-        $users = User::select('id', 'name', 'email', 'role', 'created_at')->get();
+        $users = User::select('id', 'name', 'email', 'telefono', 'role', 'created_at')->get();
         return response()->json($users);
     }
 
@@ -51,7 +51,7 @@ class UserController extends Controller
             return response()->json(['message' => 'Acceso denegado. Se requiere rol de administrador o master.'], 403);
         }
 
-        return response()->json($user->only(['id', 'name', 'email', 'role', 'created_at']));
+        return response()->json($user->only(['id', 'name', 'email', 'telefono', 'role', 'created_at']));
     }
 
     public function store(Request $request)
@@ -59,6 +59,7 @@ class UserController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
+            'telefono' => 'required|string|max:20',
             'password' => 'required|string|min:8',
             'role' => 'sometimes|string|in:usuario',
         ]);
@@ -66,12 +67,13 @@ class UserController extends Controller
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
+            'telefono' => $validated['telefono'],
             // 🔒 Hashing obligatorio de la contraseña
             'password' => Hash::make($validated['password']),
             'role' => 'usuario', // Siempre forzar 'usuario' en la ruta de registro pública
         ]);
 
-        return response()->json(['message' => 'Usuario registrado correctamente', 'user' => $user->only(['id', 'name', 'email'])], 201);
+        return response()->json(['message' => 'Usuario registrado correctamente', 'user' => $user->only(['id', 'name', 'email', 'telefono'])], 201);
     }
 
 
@@ -87,6 +89,7 @@ class UserController extends Controller
      * @OA\JsonContent(
      * @OA\Property(property="name", type="string"),
      * @OA\Property(property="email", type="string", format="email"),
+     * @OA\Property(property="telefono", type="string"),
      * @OA\Property(property="role", type="string", example="administrador") 
      * )
      * ),
@@ -104,6 +107,7 @@ class UserController extends Controller
             'name' => 'sometimes|required|string|max:255',
             // Validación de email único, excluyendo al usuario actual
             'email' => 'sometimes|required|string|email|max:255|unique:users,email,' . $user->id,
+            'telefono' => 'sometimes|required|string|max:20',
             'password' => 'sometimes|nullable|string|min:8',
             'role' => 'sometimes|required|string|in:usuario,administrador', // Actualizado
         ]);
@@ -121,7 +125,7 @@ class UserController extends Controller
 
         return response()->json([
             'message' => 'Usuario actualizado correctamente',
-            'user' => $user->only(['id', 'name', 'email', 'role'])
+            'user' => $user->only(['id', 'name', 'email', 'telefono', 'role'])
         ], 200);
     }
 
@@ -171,7 +175,7 @@ class UserController extends Controller
             return response()->json(['message' => 'Acceso denegado. Se requiere rol de administrador o maestro.'], 403);
         }
 
-        $usuarios = User::select('id', 'name', 'email', 'role', 'created_at')->get();
+        $usuarios = User::select('id', 'name', 'email', 'telefono', 'role', 'created_at')->get();
 
         return response()->json($usuarios);
     }
