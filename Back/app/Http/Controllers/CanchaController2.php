@@ -64,7 +64,7 @@ class CanchaController2 extends Controller
      * path="/api/canchas2",
      * summary="Crear una nueva cancha",
      * tags={"Canchas"},
-     * security={{"bearerAuth":{}}}, 
+     * security={{"bearerAuth":{}}},
      * @OA\RequestBody(
      * required=true,
      * @OA\JsonContent(

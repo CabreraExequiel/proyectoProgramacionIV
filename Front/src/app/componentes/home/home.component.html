@@ -16,7 +16,7 @@
       </ng-container>
 
       <ng-container *ngIf="isLoggedIn">
-        <button *ngIf="isUser" class="btn profile" [routerLink]="['/profile']">
+        <button *ngIf="isUser" class="btn profile" routerLink="perfil">
           Perfil
         </button>
         <button class="btn logout" (click)="logout()">Logout</button>

@@ -1,5 +1,3 @@
-// src/app/services/dashboard.service.ts
-
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -13,15 +11,17 @@ export class DashboardService {
 
   constructor(private http: HttpClient) {}
 
+  // 🔹 Generar headers con el token guardado
   private getAuthHeaders(): HttpHeaders {
     const token = localStorage.getItem(this.tokenKey);
-    if (token) {
-      return new HttpHeaders({
-        Authorization: `Bearer ${token}`,
-      });
-    }
-    return new HttpHeaders();
+    return token
+      ? new HttpHeaders({ Authorization: `Bearer ${token}` })
+      : new HttpHeaders();
   }
+
+  // ========================
+  // MÉTODOS DE CONSULTA API
+  // ========================
 
   getMetrics(): Observable<{ ocupacion: number; reservas_activas: number }> {
     return this.http.get<{ ocupacion: number; reservas_activas: number }>(
@@ -36,6 +36,7 @@ export class DashboardService {
     });
   }
 
+  // 🔹 Obtiene todos los usuarios registrados (requiere token válido)
   getUsuariosRegistrados(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/usuarios-registrados`, {
       headers: this.getAuthHeaders(),

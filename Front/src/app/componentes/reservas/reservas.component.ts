@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ReservaService } from '../../services/reserva.service';
 import { AuthService } from '../../services/auth.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-reservas',
@@ -35,14 +36,23 @@ export class ReservasComponent implements OnInit {
 
   esAdmin: boolean = false;
   esMaster: boolean = false;
+  esUser: boolean = false;
 
-  constructor(private fb: FormBuilder, private reservaService: ReservaService, private authService: AuthService) { }
+  constructor(private fb: FormBuilder, private reservaService: ReservaService, private authService: AuthService, private route: ActivatedRoute) { }
 
   ngOnInit(): void {
     this.usuarioActual = this.authService.getUsuario();
     const usuario = this.authService.getUsuario();
     this.esAdmin = usuario?.role === 'administrador';
     this.esMaster = usuario?.role === 'master';
+
+    this.route.queryParams.subscribe(params => {
+  const canchaId = params['cancha'];
+  if (canchaId) {
+    this.reservaForm.patchValue({ cancha_id: canchaId });
+  }
+});
+
 
     this.reservaForm = this.fb.group({
       cliente: ['', Validators.required],

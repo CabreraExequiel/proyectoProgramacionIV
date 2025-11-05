@@ -8,6 +8,9 @@ import { DashboardComponent } from './componentes/dashboard/dashboard.component'
 import { ReservasComponent } from './componentes/reservas/reservas.component';
 import { CanchasComponent } from './componentes/canchas/canchas.component';
 import { RegisterComponent } from './componentesReutilizables/register/register.component';
+import { PerfilComponent } from './componentes/perfil/perfil.component';
+import { UsuariosComponent } from './componentes/usuarios/usuarios.component';
+
 
 export const routes: Routes = [
   { path: '', component: LandingComponent },
@@ -20,6 +23,9 @@ export const routes: Routes = [
       { path: 'dashboard', component: DashboardComponent },
       { path: 'reservas', component: ReservasComponent },
       { path: 'canchas', component: CanchasComponent },
+      { path: 'usuarios', component:UsuariosComponent},
+      { path: 'perfil', component: PerfilComponent}
+     
     ],
   },
   { path: 'register', component: RegisterComponent },
