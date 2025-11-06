@@ -1,7 +1,12 @@
 @component('mail::message')
-# ¡Reserva Confirmada!
+# 🎟️ ¡Reserva Confirmada!
 
-Hola **{{ $reserva->user->name }}**, aquí tienes los detalles de tu "ticket" de reserva:
+Hola **{{ $reserva->user->name }}**,  
+¡tu reserva fue confirmada exitosamente! ⚽  
+
+A continuación, los detalles de tu ticket de reserva:
+
+---
 
 @component('mail::panel')
 **Cancha:** {{ $reserva->cancha->nombre }}  
@@ -9,7 +14,12 @@ Hola **{{ $reserva->user->name }}**, aquí tienes los detalles de tu "ticket" de
 **Hora:** {{ date('H:i', strtotime($reserva->hora_inicio)) }}
 @endcomponent
 
-Por favor, llega con 10 minutos de anticipación.
 
-¡Gracias por tu reserva!
+📍 Por favor, llegar con **10 minutos de anticipación**.  
+Te esperamos en el complejo para disfrutar del partido.
+
+---
+
+¡Gracias por confiar en nosotros!  
+**El equipo de SomosFutbol**
 @endcomponent

@@ -188,20 +188,6 @@ class ReservaController extends Controller
             'estado' => $estado,
         ]));
 
-        // --- inicio modificación para notificaciones ---
-        // Encolar el correo del ticket de reserva
-        try {
-            //Relaciones 'users' , 'cancha'
-            $reserva->load('user', 'cancha');
-
-            Mail::to($user->email)->send(new Correo_Ticket_Reserva($reserva));
-            
-        } catch (\Exception $e) {
-            // Si la cola falla, no fallar la reserva. Solo registrar el error.
-            Log::error('Error al encolar correo de ticket para reserva_id ' . $reserva->id . ': ' . $e->getMessage());
-        }
-        // --- Fin modificación para notificaciones ---
-
 
         return response()->json([
             'message' => 'Reserva creada correctamente.',
@@ -598,6 +584,17 @@ class ReservaController extends Controller
         $reserva = Reserva::findOrFail($id);
         $reserva->estado = $request->estado;
         $reserva->save();
+
+        //Notificación cuando la reserva cambie a Aprobada
+        if ($reserva->estado === 'aprobada') {
+        try {
+            $reserva->load('user', 'cancha');
+            Mail::to($reserva->user->email)->send(new \App\Mail\Correo_Ticket_Reserva($reserva));
+        } catch (\Exception $e) {
+            Log::error('Error al enviar correo de confirmación de reserva (ID ' . $reserva->id . '): ' . $e->getMessage());
+        }
+    }
+        //Fin notificación por Reserva.  Corrección de lugar
 
         return response()->json(['message' => 'Estado actualizado', 'reserva' => $reserva]);
     }
