@@ -80,4 +80,19 @@ export class ReservaService {
       headers: this.getAuthHeaders(),
     });
   }
+actualizarReserva(id: number, data: any) {
+  return this.http.put(
+    `${this.apiUrl}/reservas/${id}`,
+    data,
+    { headers: this.getAuthHeaders() }
+  );
+}
+
+eliminarReserva(id: number) {
+  return this.http.delete(
+    `${this.apiUrl}/reservas/${id}`,
+    { headers: this.getAuthHeaders() }
+  );
+}
+
 }

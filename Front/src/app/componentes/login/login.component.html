@@ -38,8 +38,18 @@
         {{ errorMessage }}
       </div>
 
-      <button type="submit" [disabled]="loginForm.invalid">Ingresar</button>
+    <button type="submit"
+            [disabled]="loginForm.invalid || enviando"
+            class="btn btn-success w-100 mt-2">
+      <ng-container *ngIf="!enviando">Ingresar</ng-container>
+      <ng-container *ngIf="enviando">
+        <span class="spinner-border spinner-border-sm me-2"></span>
+    
+    Ingresando...
+  </ng-container>
+</button>
     </form>
+
 
     <div class="footer">
       <small>No tenés cuenta? <a  [routerLink]="['/register']">Registrate</a></small>

@@ -49,6 +49,14 @@ export class DashboardService {
     });
   }
 
+  getReservasCanceladas(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/reservas/canceladas`, {
+      headers: this.getAuthHeaders(),
+    });
+  }
+
+  
+
   actualizarEstadoReserva(id: number, nuevoEstado: string): Observable<any> {
     return this.http.put(
       `${this.apiUrl}/reservas/${id}/estado`,
