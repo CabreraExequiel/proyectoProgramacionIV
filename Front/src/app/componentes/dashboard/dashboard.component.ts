@@ -15,6 +15,7 @@ export class DashboardComponent implements OnInit {
   reservasActivas: number = 0;
   reservasActivasList: any[] = [];
   reservasPendientesList: any[] = [];
+  reservasCanceladasList: any [] = [];
   usuariosRegistradosList: any[] = [];
   ingresosMensuales: number = 0;
   selectedCard: string | null = null;
@@ -26,6 +27,8 @@ export class DashboardComponent implements OnInit {
   ngOnInit(): void {
     this.dashboardService.getMetrics().subscribe({
       next: (data) => {
+          console.log('Ocupación recibida:', data.ocupacion);
+
         this.ocupacion = data.ocupacion;
         this.reservasActivas = data.reservas_activas;
         this.loading = false;
@@ -46,11 +49,17 @@ export class DashboardComponent implements OnInit {
       this.cargarReservasActivas();
     } else if (card === 'reservasPendientes') {
       this.cargarReservasPendientes();
+      } else if (card === 'reservasCanceladas') {
+      this.cargarReservasCanceladas();
     } else if (card === 'usuariosRegistrados') {
       this.cargarUsuariosRegistrados();
     } else if (card === 'ingresosMensuales') {
       this.cargarIngresosMensuales();
+       } else if (card === 'ocupacion') {  
+    this.cargarOcupacionActual();
     }
+    
+    
   }
 
   cargarReservasActivas() {
@@ -64,6 +73,7 @@ export class DashboardComponent implements OnInit {
       },
     });
   }
+  
   cargarReservasPendientes() {
     this.dashboardService.getReservasPendientes().subscribe({
       next: (data) => {
@@ -74,6 +84,17 @@ export class DashboardComponent implements OnInit {
       },
     });
   }
+
+  cargarReservasCanceladas() {
+  this.dashboardService.getReservasCanceladas().subscribe({
+    next: (data) => {
+      this.reservasCanceladasList = data; 
+    },
+    error: (err) => {
+      console.error('Error al cargar reservas canceladas:', err);
+    },
+  });
+}
 
   cargarUsuariosRegistrados() {
     this.dashboardService.getUsuariosRegistrados().subscribe({
@@ -120,4 +141,18 @@ export class DashboardComponent implements OnInit {
       },
     });
   }
+
+ cargarOcupacionActual() {
+  this.dashboardService.getMetrics().subscribe({
+    next: (data) => {
+      this.ocupacion = data.ocupacion;
+      this.reservasActivas = data.reservas_activas; 
+    },
+    error: (err) => {
+      this.ocupacion = 0;
+    }
+  });
+}
+
+
 }

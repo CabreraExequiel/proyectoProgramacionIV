@@ -744,6 +744,28 @@
                 ]
             }
         },
+        "/api/reservas/canceladas": {
+            "get": {
+                "tags": [
+                    "Reservas"
+                ],
+                "summary": "Obtener reservas canceladas (Solo ADMIN)",
+                "operationId": "bf5f6d314ebecdeb275e458fd50e9c41",
+                "responses": {
+                    "200": {
+                        "description": "Lista de reservas canceladas"
+                    },
+                    "403": {
+                        "description": "Acceso denegado (Requiere Admin)"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/reservas/{id}/estado": {
             "put": {
                 "tags": [

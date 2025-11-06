@@ -447,22 +447,40 @@ class ReservaController extends Controller
      * @OA\Response(response=403, description="Acceso denegado (Requiere Admin)")
      * )
      */
-    public function getMetrics()
-    {
 
-        if (auth()->user() && !in_array(auth()->user()->role, ['master', 'administrador'])) {
-            return response()->json(['message' => 'Acceso denegado. Se requiere rol de administrador o master.'], 403);
-        }
-        $totalCanchas = Cancha::count();
-        $reservasActivas = Reserva::whereIn('estado', ['aprobada', 'activa'])->count();
-        $ocupacion = $totalCanchas > 0 ? round(($reservasActivas / $totalCanchas) * 100, 2) : 0;
-
-        return response()->json([
-            'total_canchas' => $totalCanchas,
-            'reservas_activas' => $reservasActivas,
-            'ocupacion' => $ocupacion
-        ]);
+    public function getMetrics(Request $request)
+{
+    if (auth()->user() && !in_array(auth()->user()->role, ['master', 'administrador'])) {
+        return response()->json(['message' => 'Acceso denegado.'], 403);
     }
+
+    $totalCanchas = Cancha::count();
+     $reservasActivas = Reserva::whereIn('estado', ['aprobada', 'activa'])->count();
+
+    $bloquesPorDia = 8; 
+    $fecha = $request->input('fecha') ?? Carbon::today();
+
+    $reservasDelDia = Reserva::whereIn('estado', ['aprobada', 'activa'])
+        ->whereDate('fecha', $fecha)
+        ->get();
+
+    $bloquesOcupados = $reservasDelDia->sum(function($reserva) {
+        return Carbon::parse($reserva->hora_fin)
+            ->diffInMinutes(Carbon::parse($reserva->hora_inicio)) / 60;
+    });
+
+    $totalBloques = $totalCanchas * $bloquesPorDia;
+    $ocupacion = $totalBloques > 0 ? round(($bloquesOcupados / $totalBloques) * 100, 2) : 0;
+
+    return response()->json([
+        'total_canchas' => $totalCanchas,
+        'reservas_del_dia' => $reservasDelDia->count(),
+        'reservas_activas' => $reservasActivas,
+        'ocupacion' => $totalCanchas > 0 ? round(($reservasActivas / $totalCanchas) * 100, 2) : 0,
+        'bloques_ocupados' => $bloquesOcupados,
+        'bloques_totales' => $totalBloques,
+    ]);
+}
 
     /**
      * Obtener reservas activas (Solo ADMIN)
@@ -566,6 +584,39 @@ class ReservaController extends Controller
         return response()->json($reservas);
     }
 
+    /**
+     * @OA\Get(
+     *   path="/api/reservas/canceladas",
+     *   summary="Obtener reservas canceladas (Solo ADMIN)",
+     *   tags={"Reservas"},
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Response(response=200, description="Lista de reservas canceladas"),
+     *   @OA\Response(response=403, description="Acceso denegado (Requiere Admin)")
+     * )
+     */
+    public function getReservasCanceladas()
+    {
+        if (auth()->user() && !in_array(auth()->user()->role, ['master', 'administrador'])) {
+            return response()->json(['message' => 'Acceso denegado. Se requiere rol de administrador o master.'], 403);
+        }
+
+        $reservas = Reserva::with('cancha')
+            ->where('estado', 'cancelada')
+            ->get()
+            ->map(function ($reserva) {
+                return [
+                    'id' => $reserva->id,
+                    'cliente' => $reserva->cliente,
+                    'cancha' => $reserva->cancha->nombre,
+                    'fecha' => $reserva->fecha,
+                    'hora_inicio' => $reserva->hora_inicio,
+                    'hora_fin' => $reserva->hora_fin,
+                    'estado' => $reserva->estado
+                ];
+            });
+
+        return response()->json($reservas);
+    }
     /**
      * @OA\Put(
      * path="/api/reservas/{id}/estado",

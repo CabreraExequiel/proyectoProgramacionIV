@@ -6,7 +6,8 @@
   <h2 class="mb-3 text-center">Gestión de Reservas</h2>
 
   <!-- 🟢 Formulario siempre visible (sin botón de agregar) -->
-  <div *ngIf="!esAdmin && !esMaster" class="card p-3 mb-4 shadow-sm">
+  <div *ngIf="(!esAdmin && !esMaster) || ((esAdmin || esMaster) && mostrarFormulario)"
+  class="card p-3 mb-4 shadow-sm">
     <form [formGroup]="reservaForm" (ngSubmit)="confirmarReserva()">
       <div class="row g-3">
         <!-- Si es usuario: campo "cliente" readonly -->
@@ -171,8 +172,18 @@
             class="btn btn-success me-2"
             [disabled]="reservaForm.invalid || enviando"
           >
-            Confirmar Reserva
+            {{ editandoReserva ? 'Actualizar Reserva' : 'Confirmar Reserva' }}
           </button>
+
+          <button
+            type="button"
+            *ngIf="esAdmin || esMaster && mostrarFormulario"
+            class="btn btn-secondary ms-2"
+            (click)="cancelarEdicion()"
+          >
+            Cancelar
+          </button>
+
           <div
             *ngIf="enviando"
             class="spinner-border text-success"
@@ -197,6 +208,8 @@
         <th>Hora Inicio</th>
         <th>Hora Fin</th>
         <th>Estado</th>
+        <th>Acciones</th>
+
       </tr>
     </thead>
     <tbody>
@@ -220,14 +233,22 @@
             {{ reserva.estado }}
           </span>
         </td>
+        <td>
+        <button class="btn btn-sm btn-warning me-1"
+          (click)="iniciarEdicion(reserva)">
+          Editar
+        </button>
+        <button class="btn btn-sm btn-danger"
+          (click)="eliminarReserva(reserva.id)">
+          Eliminar
+        </button>
+      </td>
       </tr>
     </tbody>
   </table>
 
-  <div
-    *ngIf="reservasActivas.length === 0 && (esAdmin || esMaster)"
-    class="alert alert-info"
-  >
-    No hay reservas disponibles.
-  </div>
+  <div *ngIf="reservasActivas.length === 0 && (esAdmin || esMaster)" class="alert alert-info text-center">
+  No hay reservas activas en este momento.
+</div>
+
 </div>

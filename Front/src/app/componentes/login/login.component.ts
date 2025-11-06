@@ -14,6 +14,8 @@ import { Router, RouterLink } from '@angular/router';   // 👈 Importar Router
 export class LoginComponent {
   loginForm: FormGroup;
   errorMessage: string = '';
+  enviando = false;
+
 
   constructor(
     private fb: FormBuilder,
@@ -29,8 +31,12 @@ export class LoginComponent {
   onSubmit(): void {
     if (this.loginForm.invalid) return;
 
+    this.enviando = true; 
+
+
     this.authService.login(this.loginForm.value).subscribe({
       next: (res) => {
+        this.enviando = false;
         if (res.access_token) {
           this.authService.saveToken(res.access_token);
           // ✅ Redirigir al home
@@ -38,6 +44,7 @@ export class LoginComponent {
         }
       },
       error: (err) => {
+        this.enviando = false;
         if (err?.error?.message) {
           this.errorMessage = err.error.message;
         } else if (err?.status === 0) {

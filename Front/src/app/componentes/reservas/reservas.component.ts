@@ -38,6 +38,43 @@ export class ReservasComponent implements OnInit {
   esMaster: boolean = false;
   esUser: boolean = false;
   enviando = false;
+  editandoReserva: any = null;
+  
+iniciarEdicion(reserva: any) {
+  this.editandoReserva = reserva;
+  this.mostrarFormulario = true;
+
+  // Buscar los IDs correctos:
+  const canchaObj = this.canchas.find(c => c.nombre === reserva.cancha);
+  const cancha_id = canchaObj ? canchaObj.id : '';
+
+  const clienteObj = this.usuariosClientes.find(u => u.name === reserva.cliente);
+  const cliente_id = clienteObj ? clienteObj.id : '';
+
+  // Ajusta formato horario: solo HH:mm si viene como HH:mm:ss
+  const hora_inicio = reserva.hora_inicio && reserva.hora_inicio.length === 8
+    ? reserva.hora_inicio.slice(0, 5)
+    : reserva.hora_inicio;
+
+  const hora_fin = reserva.hora_fin && reserva.hora_fin.length === 8
+    ? reserva.hora_fin.slice(0, 5)
+    : reserva.hora_fin;
+
+  // Si tu select de estado usa "activa" en vez de "aprobada"
+  const estado = reserva.estado === 'aprobada' ? 'activa' : reserva.estado;
+
+  this.reservaForm.patchValue({
+    cliente: reserva.cliente,
+    cliente_id: cliente_id,
+    cancha_id: cancha_id,
+    telefono: reserva.telefono,
+    fecha: reserva.fecha,
+    hora_inicio: hora_inicio,
+    hora_fin: hora_fin,
+    estado: estado
+  });
+ 
+}
 
 
   constructor(private fb: FormBuilder, private reservaService: ReservaService, private authService: AuthService, private route: ActivatedRoute) { }
@@ -47,14 +84,6 @@ export class ReservasComponent implements OnInit {
     const usuario = this.authService.getUsuario();
     this.esAdmin = usuario?.role === 'administrador';
     this.esMaster = usuario?.role === 'master';
-
-//     this.route.queryParams.subscribe(params => {
-//   const canchaId = params['cancha'];
-//   if (canchaId) {
-//     this.reservaForm.patchValue({ cancha_id: canchaId });
-//   }
-// });
-
 
     this.reservaForm = this.fb.group({
       cliente: ['', Validators.required],
@@ -228,38 +257,57 @@ export class ReservasComponent implements OnInit {
       this.erroresBackend = null;
     }
   }
+confirmarReserva() {
+  // Asignaciones previas según el rol
+  if (this.esAdmin || this.esMaster) {
+    const clienteId = this.reservaForm.get('cliente_id')?.value;
+    const selected = this.usuariosClientes.find(u => u.id == clienteId);
+    const nombre = selected ? (selected.nombre || selected.name) : '';
+    this.reservaForm.get('cliente')?.setValue(nombre);
+  } else {
+    this.reservaForm.get('cliente_id')?.setValue(this.usuarioActual.id);
+  }
 
-  confirmarReserva() {
-    if (this.esAdmin || this.esMaster) {
-      const clienteId = this.reservaForm.get('cliente_id')?.value;
-      const selected = this.usuariosClientes.find(u => u.id == clienteId);
-      const nombre = selected ? (selected.nombre || selected.name) : '';
-      this.reservaForm.get('cliente')?.setValue(nombre);
-    } else {
-      this.reservaForm.get('cliente_id')?.setValue(this.usuarioActual.id);
-    }
+  // Validación de formulario
+  if (this.reservaForm.invalid) return;
 
-    if (this.reservaForm.invalid) return;
-     this.enviando = true; // ⏳ ACTIVAR SPINNER/BLOQUEO
+  this.enviando = true;
+  const payload = { ...this.reservaForm.getRawValue() };
 
+  // Si está en edición
+  if (this.editandoReserva) {
+    this.reservaService.actualizarReserva(this.editandoReserva.id, payload).subscribe({
+      next: (response) => {
+        this.enviando = false;
+        this.mensaje = (response as any).message || 'Reserva actualizada correctamente';
+        this.toggleFormulario();
+        this.cargarReservasActivas();
+        this.editandoReserva = null;
+        setTimeout(() => this.mensaje = '', 4000);
+      },
+      error: (err) => {
+        this.enviando = false;
+        this.erroresBackend = err.error?.errors || { general: [err.error?.error || 'Ocurrió un error'] };
+      }
+    });
+    return;
+  }
 
-    const payload = { ...this.reservaForm.getRawValue() };
-
-this.reservaService.crearReserva(payload).subscribe({
+  // Si NO está en edición, crear reserva
+  this.reservaService.crearReserva(payload).subscribe({
     next: (response) => {
-      this.enviando = false; // ⏹ DESACTIVAR SPINNER
-      this.mensaje = response.message;
+      this.enviando = false;
+      this.mensaje = (response as any).message || 'Reserva creada correctamente';
       this.toggleFormulario();
       if (this.esAdmin || this.esMaster) {
         this.cargarReservasActivas();
       } else {
         this.cargarDisponibilidadMes();
       }
-        setTimeout(() => { this.mensaje = ''; }, 8000);
-
+      setTimeout(() => { this.mensaje = ''; }, 8000);
     },
     error: (err) => {
-      this.enviando = false; // ⏹ DESACTIVAR SPINNER
+      this.enviando = false;
       if (err.status === 422) {
         this.erroresBackend = err.error.errors;
       } else if (err.status === 409) {
@@ -269,7 +317,8 @@ this.reservaService.crearReserva(payload).subscribe({
       }
     }
   });
-  }
+}
+
 
   filtrarHorariosFin() {
     const inicio = this.reservaForm.get('hora_inicio')?.value;
@@ -371,5 +420,27 @@ this.reservaService.crearReserva(payload).subscribe({
     // Cargar horarios disponibles para la cancha y fecha seleccionada
     this.cargarHorarios();
   }
+  
+eliminarReserva(reservaId: number) {
+  if (!confirm('¿Seguro que quieres eliminar esta reserva?')) return;
+  this.reservaService.eliminarReserva(reservaId).subscribe({
+    next: () => {
+      this.reservasActivas = this.reservasActivas.filter(r => r.id !== reservaId);
+      this.mensaje = 'Reserva eliminada correctamente';
+      setTimeout(() => this.mensaje = '', 4000);
+    },
+    error: (err) => {
+      this.mensaje = 'Error al eliminar la reserva';
+      setTimeout(() => this.mensaje = '', 4000);
+    }
+  });
+}
+
+cancelarEdicion() {
+  this.mostrarFormulario = false;
+  this.editandoReserva = null;
+  this.reservaForm.reset({ estado: this.esAdmin || this.esMaster ? 'aprobada' : 'pendiente' });
+}
+
 
 }

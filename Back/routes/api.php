@@ -43,6 +43,7 @@ Route::middleware('auth:api')->group(function () {
     // 🔹 Administración de Reservas
     Route::get('/reservas/activas', [ReservaController::class, 'getReservasActivas']);
     Route::get('/reservas/pendientes', [ReservaController::class, 'getReservasPendientes']);
+    Route::get('/reservas/canceladas', [ReservaController::class, 'getReservasCanceladas']);
     Route::get('/reservas/metrics', [ReservaController::class, 'getMetrics']);
     Route::get('/reservas/ingresos', [ReservaController::class, 'getIngresosMensuales']);
     Route::put('/reservas/{id}/estado', [ReservaController::class, 'actualizarEstado']);
