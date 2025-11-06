@@ -24,8 +24,9 @@ export const routes: Routes = [
       { path: 'reservas', component: ReservasComponent },
       { path: 'canchas', component: CanchasComponent },
       { path: 'usuarios', component:UsuariosComponent},
-      { path: 'perfil', component: PerfilComponent}
-     
+      { path: 'perfil', component: PerfilComponent},
+      { path: 'reservas/:id', component: ReservasComponent }
+
     ],
   },
   { path: 'register', component: RegisterComponent },

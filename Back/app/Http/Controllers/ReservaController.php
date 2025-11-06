@@ -523,7 +523,8 @@ class ReservaController extends Controller
 
         $reservas = Reserva::with('cancha')
             ->where('user_id', $userId)
-            ->whereIn('estado', ['activa', 'aprobada'])
+            ->whereIn('estado', ['activa', 'aprobada', 'pendiente', 'cancelada'])
+             ->orderBy('fecha', 'asc')
             ->get();
 
         return response()->json($reservas);

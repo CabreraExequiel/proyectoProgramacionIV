@@ -103,6 +103,19 @@ class UserController extends Controller
         ], 200);
     }
 
+
+    /**
+     * @OA\Delete(
+     * path="/api/users/{id}",
+     * summary="Eliminar un usuario (Solo Administrador)",
+     * tags={"Usuarios"},
+     * security={{"bearerAuth":{}}},
+     * @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     * @OA\Response(response=200, description="Usuario eliminado correctamente"),
+     * @OA\Response(response=403, description="Acceso denegado (Requiere Administrador)")
+     * )
+     */
+    
     // 🔹 Eliminar un usuario (solo admin/master)
     public function destroy(User $user)
     {
@@ -144,4 +157,19 @@ class UserController extends Controller
 
         return response()->json($usuarios);
     }
+        public function actualizarTelefono(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+        $request->validate([
+            'telefono' => 'required|string|max:20'
+        ]);
+
+        $user->telefono = $request->telefono;
+        $user->save();
+
+        return response()->json($user);
+    }
+
 }
+
+

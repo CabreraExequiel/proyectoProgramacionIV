@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { HttpHeaders } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
@@ -23,6 +24,7 @@ export class AuthService {
       tap((res: any) => {
         this.saveToken(res.access_token); // ✅ Coincide con tu backend
         localStorage.setItem('user_role', res.user.role);
+        
         this.userRole.next(res.user.role);
         localStorage.setItem('usuario', JSON.stringify(res.user));
       })
@@ -56,10 +58,20 @@ export class AuthService {
   name: string;
   email: string;
   role: string;
-  created_at: string; // 🆕 agregado: fecha de registro
+  created_at: string; // agregado: fecha de registro
   telefono: number
 } | null {
   const usuario = localStorage.getItem('usuario');
   return usuario ? JSON.parse(usuario) : null;
 }
+
+actualizarTelefono(id: number, telefono: string): Observable<any> {
+  const token = this.getToken();
+  const headers = new HttpHeaders({
+    'Authorization': `Bearer ${token}`
+  });
+
+  return this.http.put(`${this.apiUrl}/usuarios/${id}`, { telefono }, { headers });
+}
+
 }

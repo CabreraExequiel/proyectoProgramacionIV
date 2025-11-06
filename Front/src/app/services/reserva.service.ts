@@ -76,7 +76,7 @@ export class ReservaService {
   }
 
   getUsuariosClientes() {
-    return this.http.get<any[]>(`${this.apiUrl}/users`, {
+    return this.http.get<any[]>(`${this.apiUrl}/usuarios-registrados`, {
       headers: this.getAuthHeaders(),
     });
   }

@@ -141,8 +141,10 @@ class AuthController extends Controller
             'id' => auth('api')->user()->id,
             'name' => auth('api')->user()->name,
             'email' => auth('api')->user()->email,
-            'telefono' => auth('api')->user()->telefono,  // <-- incluir aquí
+            'telefono' => auth('api')->user()->telefono, // agregado
             'role' => auth('api')->user()->role,
+            'created_at' => auth('api')->user()->created_at->toDateTimeString(), // agregado
+
         ],
         'access_token' => $token,
         'token_type' => 'bearer',

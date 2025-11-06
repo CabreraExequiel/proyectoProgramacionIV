@@ -37,6 +37,8 @@ export class ReservasComponent implements OnInit {
   esAdmin: boolean = false;
   esMaster: boolean = false;
   esUser: boolean = false;
+  enviando = false;
+
 
   constructor(private fb: FormBuilder, private reservaService: ReservaService, private authService: AuthService, private route: ActivatedRoute) { }
 
@@ -46,12 +48,12 @@ export class ReservasComponent implements OnInit {
     this.esAdmin = usuario?.role === 'administrador';
     this.esMaster = usuario?.role === 'master';
 
-    this.route.queryParams.subscribe(params => {
-  const canchaId = params['cancha'];
-  if (canchaId) {
-    this.reservaForm.patchValue({ cancha_id: canchaId });
-  }
-});
+//     this.route.queryParams.subscribe(params => {
+//   const canchaId = params['cancha'];
+//   if (canchaId) {
+//     this.reservaForm.patchValue({ cancha_id: canchaId });
+//   }
+// });
 
 
     this.reservaForm = this.fb.group({
@@ -67,6 +69,13 @@ export class ReservasComponent implements OnInit {
       hora_fin: [{ value: '', disabled: true }, Validators.required],
       estado: [this.esAdmin || this.esMaster ? 'aprobada' : 'pendiente', Validators.required]
     });
+
+      this.route.paramMap.subscribe(params => {
+    const canchaId = params.get('id');
+    if (canchaId) {
+      this.reservaForm.patchValue({ cancha_id: canchaId });
+    }
+  });
 
     // Solo si NO es admin/master, setea el nombre al FormControl
     if (!this.esAdmin && !this.esMaster && this.usuarioActual) {
@@ -231,29 +240,35 @@ export class ReservasComponent implements OnInit {
     }
 
     if (this.reservaForm.invalid) return;
+     this.enviando = true; // ⏳ ACTIVAR SPINNER/BLOQUEO
+
 
     const payload = { ...this.reservaForm.getRawValue() };
 
-    this.reservaService.crearReserva(payload).subscribe({
-      next: (response) => {
-        this.mensaje = response.message;
-        this.toggleFormulario();
-        if (this.esAdmin || this.esMaster) {
-          this.cargarReservasActivas();
-        } else {
-          this.cargarDisponibilidadMes();
-        }
-      },
-      error: (err) => {
-        if (err.status === 422) {
-          this.erroresBackend = err.error.errors;
-        } else if (err.status === 409) {
-          this.erroresBackend = { horario: ['Ya existe una reserva en ese horario'] };
-        } else {
-          this.erroresBackend = { general: [err.error?.error || 'Ocurrió un error'] };
-        }
+this.reservaService.crearReserva(payload).subscribe({
+    next: (response) => {
+      this.enviando = false; // ⏹ DESACTIVAR SPINNER
+      this.mensaje = response.message;
+      this.toggleFormulario();
+      if (this.esAdmin || this.esMaster) {
+        this.cargarReservasActivas();
+      } else {
+        this.cargarDisponibilidadMes();
       }
-    });
+        setTimeout(() => { this.mensaje = ''; }, 8000);
+
+    },
+    error: (err) => {
+      this.enviando = false; // ⏹ DESACTIVAR SPINNER
+      if (err.status === 422) {
+        this.erroresBackend = err.error.errors;
+      } else if (err.status === 409) {
+        this.erroresBackend = { horario: ['Ya existe una reserva en ese horario'] };
+      } else {
+        this.erroresBackend = { general: [err.error?.error || 'Ocurrió un error'] };
+      }
+    }
+  });
   }
 
   filtrarHorariosFin() {

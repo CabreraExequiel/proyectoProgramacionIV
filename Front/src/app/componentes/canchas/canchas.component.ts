@@ -56,7 +56,7 @@ export class CanchasComponent implements OnInit {
       tipo: ['', Validators.required],
       precio_hora: [0, Validators.required],
       cant_jugadores: [0, Validators.required],
-      id: [0, Validators.required]
+      // id: [0, Validators.required]
     });
   }
 
@@ -75,13 +75,18 @@ export class CanchasComponent implements OnInit {
     });
   }
 
- 
-
   mostrarFormularioCrear(): void {
     this.mostrarForm = true;
     this.editando = false;
     this.canchaEditandoId = null;
-    this.formCancha.reset({ precio_hora: 0, cant_jugadores: 0 });
+    this.formCancha.reset({
+      nombre: '',
+      tipo: '',
+      precio_hora: 0,
+      cant_jugadores: 0,
+      id: null, // o quita si no es usado
+    });
+    console.log('Formulario después de reset:', this.formCancha.value);
   }
 
   mostrarFormularioEditar(cancha: Cancha): void {
@@ -94,27 +99,27 @@ export class CanchasComponent implements OnInit {
       precio_hora: cancha.precio_hora || 0,
       cant_jugadores: cancha.cant_jugadores || 0,
     });
+    console.log('Formulario al editar:', this.formCancha.value);
   }
 
   guardarCancha(): void {
+    console.log('Formulario válido:', this.formCancha.valid);
+    console.log('Datos del formulario:', this.formCancha.value);
     if (this.formCancha.invalid) return;
 
     const datos = this.formCancha.value;
 
     if (this.editando && this.canchaEditandoId !== null) {
-      this.canchasService
-        .actualizarCancha(this.canchaEditandoId, datos)
-        .subscribe({
-          next: (updated: Cancha) => {
-            const index = this.canchas.findIndex(
-              (c) => c.id === this.canchaEditandoId
-            );
-            if (index !== -1) this.canchas[index] = updated;
-            this.mostrarForm = false;
-          },
-          error: (err: HttpErrorResponse) => console.error(err),
-        });
-    } else {
+  this.canchasService.actualizarCancha(this.canchaEditandoId, datos)
+    .subscribe({
+      next: (updated: Cancha) => {
+        this.obtenerCanchas(); // Recarga todas las canchas desde backend
+        this.mostrarForm = false;
+      },
+      error: (err: HttpErrorResponse) => console.error(err),
+    });
+}
+ else {
       this.canchasService.crearCancha(datos).subscribe({
         next: (created: Cancha) => {
           this.canchas.push(created);
@@ -130,9 +135,8 @@ irAReservas(canchaId?: number): void {
     console.warn('⚠️ ID de cancha no válido');
     return;
   }
+    this.router.navigate(['home', 'reservas', canchaId]);
 
-  // 🔹 Redirige al componente Reservas con el ID de cancha como parámetro
-  this.router.navigate(['/reservas'], { queryParams: { cancha: canchaId } });
 }
 
   eliminarCancha(id: number | undefined): void {

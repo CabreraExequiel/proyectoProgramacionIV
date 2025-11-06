@@ -62,7 +62,7 @@ class CanchaController2 extends Controller
     /**
      * @OA\Post(
      * path="/api/canchas2",
-     * summary="Crear una nueva cancha",
+     * summary="Crear una nueva cancha (Solo ADMIN)",
      * tags={"Canchas"},
      * security={{"bearerAuth":{}}},
      * @OA\RequestBody(
@@ -106,7 +106,7 @@ class CanchaController2 extends Controller
     /**
      * @OA\Put(
      * path="/api/canchas2/{id}",
-     * summary="Actualizar una cancha existente",
+     * summary="Actualizar una cancha existente (Solo ADMIN)",
      * tags={"Canchas"},
      * security={{"bearerAuth":{}}},
      * @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
@@ -160,7 +160,7 @@ class CanchaController2 extends Controller
     /**
      * @OA\Delete(
      * path="/api/canchas2/{id}",
-     * summary="Eliminar una cancha",
+     * summary="Eliminar una cancha (Solo ADMIN)",
      * tags={"Canchas"},
      * security={{"bearerAuth":{}}},
      * @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),

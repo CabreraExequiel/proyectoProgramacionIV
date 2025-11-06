@@ -4,8 +4,11 @@
   padding: 2rem;
   background-color: #f9f9f9;
   overflow-y: auto;
-  max-height: 100vh;
+  height: 90vh;
+
 }
+
+
 .metric-grid {
   display: flex;
   justify-content: center;
@@ -62,5 +65,11 @@
   border: none;
   padding: 5px 10px;
   cursor: pointer;
+}
+
+.table-responsive-fixed {
+  max-height: 400px;
+  overflow-y: auto;
+  margin-bottom: 1rem;
 }
 
