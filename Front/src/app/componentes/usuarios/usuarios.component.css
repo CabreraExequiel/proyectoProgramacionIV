@@ -36,6 +36,7 @@
 
 .btn-cerrar {
   margin-top: 20px;
+  align-items: center;
   background: #dc3545;
   color: #fff;
   border: none;

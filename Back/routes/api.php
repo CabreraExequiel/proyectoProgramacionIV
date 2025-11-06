@@ -49,6 +49,11 @@ Route::middleware('auth:api')->group(function () {
 
     // 🔹 Administración de Usuarios
     Route::get('/usuarios-registrados', [UserController::class, 'getUsuariosRegistrados']); // ✅ único endpoint para el front
+    Route::put('/usuarios/{id}', [UserController::class, 'actualizarTelefono']);
+    Route::put('/users/{user}', [UserController::class, 'update']);
+
+
+
 
     // 🔹 Administración de Canchas
     Route::apiResource('canchas2', CanchaController2::class)->except(['index', 'show']);

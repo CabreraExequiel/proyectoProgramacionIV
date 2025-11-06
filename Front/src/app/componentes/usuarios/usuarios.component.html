@@ -8,7 +8,10 @@
   <div *ngIf="error" class="error">{{ error }}</div>
 
   <!-- 🔹 Tabla de usuarios (solo si hay resultados) -->
-  <table *ngIf="!cargando && usuarios.length > 0 && esAdmin" class="tabla-usuarios">
+  <table
+    *ngIf="!cargando && usuarios.length > 0 && esAdmin"
+    class="tabla-usuarios"
+  >
     <thead>
       <tr>
         <th>ID</th>
@@ -25,13 +28,15 @@
         <td>{{ u.name }}</td>
         <td>{{ u.email }}</td>
         <td>
-          <span [class.admin]="u.role === 'administrador'"
-                [class.usuario]="u.role === 'usuario'">
+          <span
+            [class.admin]="u.role === 'administrador'"
+            [class.usuario]="u.role === 'usuario'"
+          >
             {{ u.role }}
           </span>
         </td>
-        <td>{{ u.telefono || '—' }}</td>
-        <td>{{ u.created_at | date: 'dd/MM/yyyy HH:mm' }}</td>
+        <td>{{ u.telefono || "—" }}</td>
+        <td>{{ u.created_at | date : "dd/MM/yyyy HH:mm" }}</td>
       </tr>
     </tbody>
   </table>
@@ -42,5 +47,7 @@
   </p>
 
   <!-- 🔹 Botón de logout -->
-  <button (click)="cerrarSesion()" class="btn-cerrar">Cerrar sesión</button>
+  <div class="text-center">
+    <button (click)="cerrarSesion()" class="btn-cerrar">Cerrar sesión</button>
+  </div>
 </div>

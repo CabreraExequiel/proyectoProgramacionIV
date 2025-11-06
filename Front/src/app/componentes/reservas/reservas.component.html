@@ -1,9 +1,13 @@
 <div class="container mt-4">
+  <div *ngIf="mensaje" class="alert alert-success text-center">
+    {{ mensaje }}
+  </div>
+
   <h2 class="mb-3 text-center">Gestión de Reservas</h2>
 
   <!-- 🟢 Formulario siempre visible (sin botón de agregar) -->
   <div *ngIf="!esAdmin && !esMaster" class="card p-3 mb-4 shadow-sm">
-  <form [formGroup]="reservaForm" (ngSubmit)="confirmarReserva()">
+    <form [formGroup]="reservaForm" (ngSubmit)="confirmarReserva()">
       <div class="row g-3">
         <!-- Si es usuario: campo "cliente" readonly -->
         <div class="col-md-4" *ngIf="!esAdmin && !esMaster">
@@ -27,7 +31,10 @@
             class="form-select"
           >
             <option value="">-- Seleccione cliente --</option>
-            <option *ngFor="let cliente of usuariosClientes" [value]="cliente.id">
+            <option
+              *ngFor="let cliente of usuariosClientes"
+              [value]="cliente.id"
+            >
               {{ cliente.name }}
             </option>
           </select>
@@ -40,7 +47,7 @@
             type="text"
             class="form-control"
             formControlName="telefono"
-            placeholder="Ej: 1123456789"
+            [readonly]="!esAdmin && !esMaster"
           />
         </div>
 
@@ -97,7 +104,7 @@
                 }"
                 (click)="seleccionarDia(dia)"
               >
-                {{ dia.numero || '' }}
+                {{ dia.numero || "" }}
               </div>
             </div>
           </div>
@@ -162,10 +169,15 @@
           <button
             type="submit"
             class="btn btn-success me-2"
-            [disabled]="reservaForm.invalid"
+            [disabled]="reservaForm.invalid || enviando"
           >
             Confirmar Reserva
           </button>
+          <div
+            *ngIf="enviando"
+            class="spinner-border text-success"
+            role="status"
+          ></div>
         </div>
       </div>
     </form>
@@ -191,15 +203,16 @@
       <tr *ngFor="let reserva of reservasActivas">
         <td>{{ reserva.cliente }}</td>
         <td>{{ reserva.telefono }}</td>
-        <td>{{ reserva.cancha || '-' }}</td>
-        <td>{{ reserva.fecha | date: 'dd/MM/yyyy' }}</td>
+        <td>{{ reserva.cancha || "-" }}</td>
+        <td>{{ reserva.fecha | date : "dd/MM/yyyy" }}</td>
         <td>{{ reserva.hora_inicio }}</td>
         <td>{{ reserva.hora_fin }}</td>
         <td>
           <span
             class="badge"
             [ngClass]="{
-              'bg-success': reserva.estado === 'activa' || reserva.estado === 'aprobada',
+              'bg-success':
+                reserva.estado === 'activa' || reserva.estado === 'aprobada',
               'bg-warning text-dark': reserva.estado === 'pendiente',
               'bg-danger': reserva.estado === 'cancelada'
             }"

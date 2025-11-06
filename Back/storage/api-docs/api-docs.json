@@ -41,6 +41,10 @@
                                         "format": "email",
                                         "example": "juan@example.com"
                                     },
+                                    "telefono": {
+                                        "type": "string",
+                                        "example": "123456789"
+                                    },
                                     "password": {
                                         "type": "string",
                                         "format": "password",
@@ -98,6 +102,10 @@
                                         "format": "email",
                                         "example": "juan@example.com"
                                     },
+                                    "telefono": {
+                                        "type": "string",
+                                        "example": "123456789"
+                                    },
                                     "password": {
                                         "type": "string",
                                         "format": "password",
@@ -139,7 +147,7 @@
                 "tags": [
                     "Canchas"
                 ],
-                "summary": "Crear una nueva cancha",
+                "summary": "Crear una nueva cancha (Solo ADMIN)",
                 "operationId": "3963bbbd4a28f4dfbbfcd03f3963dad8",
                 "requestBody": {
                     "required": true,
@@ -224,7 +232,7 @@
                 "tags": [
                     "Canchas"
                 ],
-                "summary": "Actualizar una cancha existente",
+                "summary": "Actualizar una cancha existente (Solo ADMIN)",
                 "operationId": "fa1ab91a1ad1b1ba2b7498c09e41e902",
                 "parameters": [
                     {
@@ -291,7 +299,7 @@
                 "tags": [
                     "Canchas"
                 ],
-                "summary": "Eliminar una cancha",
+                "summary": "Eliminar una cancha (Solo ADMIN)",
                 "operationId": "ef98a39ac76a0a209090fd0b5f6ee787",
                 "parameters": [
                     {
@@ -848,64 +856,7 @@
                 }
             }
         },
-        "/api/users": {
-            "get": {
-                "tags": [
-                    "Usuarios"
-                ],
-                "summary": "Listar todos los usuarios (Solo Administrador)",
-                "description": "Listar todos los usuarios (Solo Administrador)",
-                "operationId": "c457726701591d1183b53aa71fc13441",
-                "responses": {
-                    "200": {
-                        "description": "Lista de usuarios"
-                    },
-                    "403": {
-                        "description": "Acceso denegado (Requiere Administrador)"
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
         "/api/users/{id}": {
-            "get": {
-                "tags": [
-                    "Usuarios"
-                ],
-                "summary": "Obtener un usuario por ID (Solo Administrador)",
-                "description": "Obtener un usuario por ID (Solo Administrador)",
-                "operationId": "36a33ff774d5cba33c039dec2c3e0287",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Datos del usuario"
-                    },
-                    "403": {
-                        "description": "Acceso denegado (Requiere Administrador)"
-                    },
-                    "404": {
-                        "description": "Usuario no encontrado"
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            },
             "put": {
                 "tags": [
                     "Usuarios"
@@ -934,6 +885,9 @@
                                     "email": {
                                         "type": "string",
                                         "format": "email"
+                                    },
+                                    "telefono": {
+                                        "type": "string"
                                     },
                                     "role": {
                                         "type": "string",

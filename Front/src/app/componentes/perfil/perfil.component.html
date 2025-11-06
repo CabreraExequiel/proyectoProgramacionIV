@@ -12,12 +12,29 @@
         Rol: <strong>{{ usuario.role }}</strong>
       </p>
     </div>
-
     <div class="perfil-detalles">
-      <p><span>Teléfono:</span> {{ usuario.telefono || 'No informado' }}</p>
+      <p class="telefono-row">
+        <span>Teléfono:</span>
+        <ng-container *ngIf="editandoTelefono; else soloVistaTelefono">
+          <input
+            [(ngModel)]="usuario.telefono"
+            type="text"
+            class="telefono-input"
+          />
+        </ng-container>
+        <ng-template #soloVistaTelefono>
+          {{ usuario.telefono || "No informado" }}
+          <button (click)="editarTelefono()" class="btn-editar">Editar</button>
+        </ng-template>
+      </p>
+      <div *ngIf="editandoTelefono" class="boton-row">
+        <button (click)="guardarTelefono()" class="btn-guardar">Guardar</button>
+        <button (click)="cancelarEdicion()" class="btn-cancelar">Cancelar</button>
+      </div>
+
       <p>
         <span>Registrado el:</span>
-        {{ usuario.created_at | date: 'dd/MM/yyyy HH:mm' }}
+        {{ usuario.created_at | date : "dd/MM/yyyy HH:mm" }}
       </p>
     </div>
 
@@ -32,3 +49,42 @@
     <p>No hay información del usuario disponible.</p>
   </div>
 </ng-template>
+
+<div class="reservas-usuario mt-4">
+  <h4>Mis Reservas</h4>
+  <table class="table table-sm table-bordered" *ngIf="reservasUsuario.length > 0">
+    <thead>
+      <tr>
+        <th>Cancha</th>
+        <th>Fecha</th>
+        <th>Hora Inicio</th>
+        <th>Hora Fin</th>
+        <th>Estado</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let reserva of reservasUsuario">
+        <td>{{ reserva.cancha.id }}</td>
+        <td>{{ reserva.fecha | date: 'dd/MM/yyyy' }}</td>
+        <td>{{ reserva.hora_inicio }}</td>
+        <td>{{ reserva.hora_fin }}</td>
+        <td>
+          <span 
+            class="badge"
+            [ngClass]="{
+              'bg-success': reserva.estado === 'aprobada' || reserva.estado === 'activa',
+              'bg-warning text-dark': reserva.estado === 'pendiente',
+              'bg-danger': reserva.estado === 'cancelada'
+            }"
+          >
+            {{ reserva.estado }}
+          </span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div *ngIf="reservasUsuario.length === 0" class="alert alert-info">
+    No tienes reservas registradas.
+  </div>
+</div>
+
